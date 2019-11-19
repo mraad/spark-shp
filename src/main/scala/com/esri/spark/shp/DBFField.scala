@@ -1,55 +1,61 @@
 package com.esri.spark.shp
 
 import java.nio.{ByteBuffer, ByteOrder}
+import java.sql.{Date, Timestamp}
+import java.text.SimpleDateFormat
 
 import org.apache.hadoop.fs.FSDataInputStream
 import org.apache.spark.sql.types._
 import org.slf4j.LoggerFactory
 
 /**
-  * A DBF Field trait.
-  */
+ * A DBF Field trait.
+ */
 trait DBFField extends Serializable {
   type T
 
   /**
-    * @return the field name.
-    */
+   * @return the field name.
+   */
   def name(): String
 
   /**
-    * @return field offset in the the row.
-    */
+   * @return field offset in the the row.
+   */
   def offset(): Int
 
   /**
-    * @return the field length.
-    */
+   * @return the field length.
+   */
   def length(): Int
 
   /**
-    * @return SparkSQL field.
-    */
+   * @return SparkSQL field.
+   */
   def toStructField(): StructField
 
   /**
-    * Read the field value.
-    *
-    * @param buffer the stream byte buffer.
-    * @return a field value of type T.
-    */
+   * Read the field value.
+   *
+   * @param buffer the stream byte buffer.
+   * @return a field value of type T.
+   */
   def readValue(buffer: ByteBuffer): T
 }
 
 case class FieldDate(name: String, offset: Int, length: Int) extends DBFField {
-  override type T = String
+  // Date rather than Timestamp as DBF hold only YYYYMMDD !
+  override type T = Date
+  private val dateFormat = new SimpleDateFormat("yyyyMMdd")
 
   def toStructField(): StructField = {
-    StructField(name, StringType) // TODO, Make Timestamp
+    StructField(name, DateType)
   }
 
-  def readValue(buffer: ByteBuffer): String = {
-    new String(buffer.array(), offset, length).trim()
+  def readValue(buffer: ByteBuffer): Date = {
+    val text = new String(buffer.array(), offset, length).trim()
+    val date = dateFormat.parse(text)
+    new Date(date.getTime)
   }
 }
 
@@ -139,12 +145,12 @@ case class FieldBoolean(name: String, offset: Int, length: Int) extends DBFField
 
 object DBFField extends Serializable {
   /**
-    * Create a DBFField instance.
-    *
-    * @param stream the input stream.
-    * @param offset the stream offset.
-    * @return a DBFField instance.
-    */
+   * Create a DBFField instance.
+   *
+   * @param stream the input stream.
+   * @param offset the stream offset.
+   * @return a DBFField instance.
+   */
   def apply(stream: FSDataInputStream, offset: Int): DBFField = {
 
     val logger = LoggerFactory.getLogger(getClass)
