@@ -1,12 +1,32 @@
 # Spark Shp
 
-A library for parsing and querying Shapefile data with Apache Spark, for Spark SQL and DataFrames.
+A library for parsing and querying [shapefile](https://en.wikipedia.org/wiki/Shapefile) data with Apache Spark, for Spark SQL and DataFrames.
 
-```
-spark-shell --packages com.esri:spark-shp:XX
+### Requirements
+
+This library requires Spark 2.0+
+
+### Using with Spark shell
+
+```shell script
+$SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.2
 ```
 
-### Usage Example
+### Features
+
+This package allows reading shapefiles files in local or distributed filesystem as Spark DataFrames. When reading files the API accepts several options:
+
+- `path`: location of files. Similar to Spark can accept standard Hadoop globbing expressions.
+
+### SQL API
+
+```sql
+CREATE TABLE gps
+USING com.esri.shp
+OPTIONS (path "gps.shp")
+```
+
+### Python API
 
 ```
 df = spark.read \
@@ -14,6 +34,11 @@ df = spark.read \
     .options(path=path) \
     .load()
 ```
+
+### Building From Source
+
+
+### Misc
 
 ```
 import io
