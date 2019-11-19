@@ -1,4 +1,4 @@
-# Spark Shp
+# Shapefile Data Source for Apache Spark
 
 A library for parsing and querying [shapefile](https://en.wikipedia.org/wiki/Shapefile) data with Apache Spark, for Spark SQL and DataFrames.
 
@@ -14,16 +14,16 @@ $SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.2
 
 ### Features
 
-This package allows reading shapefiles files in local or distributed filesystem as Spark DataFrames. When reading files the API accepts several options:
+This package allows reading shapefiles in local or distributed filesystem as Spark DataFrames. When reading files the API accepts several options:
 
-- `path`: location of files. Similar to Spark can accept standard Hadoop globbing expressions.
+- `path` : location of files. Similar to Spark can accept standard Hadoop globbing expressions.
 
 ### SQL API
 
 ```sql
 CREATE TABLE gps
 USING com.esri.shp
-OPTIONS (path "gps.shp")
+OPTIONS (path "data/gps.shp")
 ```
 
 ### Python API
@@ -37,6 +37,15 @@ df = spark.read \
 
 ### Building From Source
 
+This library is built using [Apache Maven](https://maven.apache.org/). To build the jar, execute the following command:
+
+```shell script
+mvn clean install
+```
+
+### Data
+
+- Download the shapefile of [Metro Stations in DC](https://opendata.dc.gov/datasets/54018b7f06b943f2af278bbe415df1de_52)
 
 ### Misc
 

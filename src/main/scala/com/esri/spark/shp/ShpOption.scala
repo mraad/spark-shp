@@ -1,4 +1,4 @@
-package com.esri.shp
+package com.esri.spark.shp
 
 /**
   * Options for spark sql read.

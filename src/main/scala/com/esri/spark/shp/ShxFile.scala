@@ -1,4 +1,4 @@
-package com.esri.shp
+package com.esri.spark.shp
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, Path}

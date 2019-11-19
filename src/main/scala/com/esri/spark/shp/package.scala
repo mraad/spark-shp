@@ -1,25 +1,22 @@
-package com.esri
+package com.esri.spark
 
 import java.nio.{ByteBuffer, ByteOrder}
 
-import com.esri.core.geometry.{Geometry, GeometryEngine, Operator, OperatorFactoryLocal, OperatorImportFromESRIShape, ShapeImportFlags}
+import com.esri.core.geometry._
 import org.apache.spark.sql.{DataFrame, DataFrameReader, Row, SQLContext}
 
-/**
-  * Object to support implicits.
-  */
 package object shp {
 
   implicit class RowImplicits(row: Row) extends Serializable {
     private val op = OperatorFactoryLocal.getInstance.getOperator(Operator.Type.ImportFromESRIShape).asInstanceOf[OperatorImportFromESRIShape]
 
     /**
-      * Get Geometry instance from SQL Row.
-      * It is assumed that the first field contains the geometry as an array of bytes in ESRI binary format.
-      *
-      * @param index the field index. Default = 0.
-      * @return Geometry instance.
-      */
+     * Get Geometry instance from SQL Row.
+     * It is assumed that the first field contains the geometry as an array of bytes in ESRI binary format.
+     *
+     * @param index the field index. Default = 0.
+     * @return Geometry instance.
+     */
     def getGeometry(index: Int = 0): Geometry = {
       // GeometryEngine.geometryFromEsriShape(row.getAs[Array[Byte]](0), Geometry.Type.Unknown)
       val esriShapeBuffer = row.getAs[Array[Byte]](index)

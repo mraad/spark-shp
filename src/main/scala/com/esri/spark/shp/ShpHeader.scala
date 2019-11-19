@@ -1,4 +1,4 @@
-package com.esri.shp
+package com.esri.spark.shp
 
 import java.io.{DataInputStream, IOException}
 import java.nio.{ByteBuffer, ByteOrder}

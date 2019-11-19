@@ -1,4 +1,4 @@
-package com.esri.shp
+package com.esri.spark.shp
 
 import org.apache.hadoop.fs.{Path, PathFilter}
 import org.apache.spark.rdd.RDD

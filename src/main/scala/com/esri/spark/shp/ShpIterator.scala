@@ -1,4 +1,4 @@
-package com.esri.shp
+package com.esri.spark.shp
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
