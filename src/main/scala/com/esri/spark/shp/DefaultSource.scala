@@ -30,8 +30,9 @@ class DefaultSource extends RelationProvider with SchemaRelationProvider {
     val logger = LoggerFactory.getLogger(getClass)
     val path = parameters.getOrElse(ShpOption.PATH, sys.error(f"Parameter '${ShpOption.PATH}' must be defined."))
     val shape = parameters.getOrElse(ShpOption.SHAPE, ShpOption.SHAPE)
+    val format = parameters.getOrElse(ShpOption.FORMAT, ShpOption.FORMAT_SHP)
     val columns = parameters.getOrElse(ShpOption.COLUMNS, "")
     logger.debug(s"${ShpOption.PATH}=$path, ${ShpOption.SHAPE}=$shape, ${ShpOption.COLUMNS}=$columns")
-    ShpRelation(path, shape, columns)(sqlContext)
+    ShpRelation(path, shape, format, columns)(sqlContext)
   }
 }

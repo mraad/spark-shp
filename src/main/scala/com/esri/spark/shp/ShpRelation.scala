@@ -3,18 +3,23 @@ package com.esri.spark.shp
 import org.apache.hadoop.fs.{Path, PathFilter}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.sources.{BaseRelation, TableScan}
-import org.apache.spark.sql.types.{BinaryType, StructField, StructType}
+import org.apache.spark.sql.types.{BinaryType, StringType, StructField, StructType}
 import org.apache.spark.sql.{Row, SQLContext}
 import org.slf4j.LoggerFactory
 
 /**
  * Shapefile Relation
  *
- * @param pathName   path name where shapefiles are located.
- * @param shapeField the name of the shape field.
- * @param columns    Comma separated list of columns to read. "" means all fields.
+ * @param pathName    The path name where shapefiles are located.
+ * @param shapeName   The name of the shape field.
+ * @param shapeFormat The shape field output format.
+ * @param columns     Comma separated list of columns to read. "" means all fields.
  */
-case class ShpRelation(pathName: String, shapeField: String, columns: String)(@transient val sqlContext: SQLContext)
+case class ShpRelation(pathName: String,
+                       shapeName: String,
+                       shapeFormat: String,
+                       columns: String
+                      )(@transient val sqlContext: SQLContext)
   extends BaseRelation with TableScan {
 
   private lazy val logger = LoggerFactory.getLogger(getClass)
@@ -32,6 +37,11 @@ case class ShpRelation(pathName: String, shapeField: String, columns: String)(@t
   }
 
   override lazy val schema = {
+    val shapeType = shapeFormat match {
+      case ShpOption.FORMAT_WKT => StringType
+      case ShpOption.FORMAT_GEOJSON => StringType
+      case _ => BinaryType
+    }
     val configuration = sqlContext.sparkContext.hadoopConfiguration
     val path = new Path(pathName)
     using(path.getFileSystem(configuration))(fs => {
@@ -49,7 +59,7 @@ case class ShpRelation(pathName: String, shapeField: String, columns: String)(@t
             case Some(fileStatus) => {
               logger.debug("Schema is based on {}", fileStatus.getPath.toUri.toString)
               using(DBFFile(fileStatus.getPath, configuration, 0L, arrColumns))(dbfFile => {
-                StructType(dbfFile.addFieldTypes(Array(StructField(shapeField, BinaryType))))
+                StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType))))
               })
             }
             case _ => {
@@ -60,7 +70,7 @@ case class ShpRelation(pathName: String, shapeField: String, columns: String)(@t
         }
         else {
           using(DBFFile(pathName.replace(".shp", ""), configuration, 0L, arrColumns))(dbfFile => {
-            StructType(dbfFile.addFieldTypes(Array(StructField(shapeField, BinaryType))))
+            StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType))))
           })
         }
       } else {
@@ -71,7 +81,7 @@ case class ShpRelation(pathName: String, shapeField: String, columns: String)(@t
             val pathName = fileStatus.getPath.toUri.toString.replace(".shp", "")
             logger.debug("Schema is based on {}", pathName)
             using(DBFFile(pathName, configuration, 0L, arrColumns))(dbfFile => {
-              StructType(dbfFile.addFieldTypes(Array(StructField(shapeField, BinaryType))))
+              StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType))))
             })
           }
           case _ => {
@@ -84,6 +94,6 @@ case class ShpRelation(pathName: String, shapeField: String, columns: String)(@t
   }
 
   override def buildScan(): RDD[Row] = {
-    ShpRDD(sqlContext.sparkContext, schema, pathName, arrColumns)
+    ShpRDD(sqlContext.sparkContext, schema, pathName, arrColumns, shapeFormat)
   }
 }

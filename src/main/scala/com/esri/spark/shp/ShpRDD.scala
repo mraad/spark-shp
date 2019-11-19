@@ -8,12 +8,13 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.{Partition, SparkContext, TaskContext}
 
-case class ShpPartition(index: Int, pathName: String) extends Partition
+case class ShpPartition(index: Int, pathName: String) extends Partition // TODO, Remove index as it is not used !
 
 case class ShpRDD(@transient sc: SparkContext,
                   schema: StructType,
                   pathName: String,
-                  columns: Array[String]
+                  columns: Array[String],
+                  shapeFormat: String
                  ) extends RDD[Row](sc, Nil) {
 
   @DeveloperApi
@@ -21,14 +22,19 @@ case class ShpRDD(@transient sc: SparkContext,
     partition match {
       case part: ShpPartition => {
         val hadoopConf = if (sc == null) new Configuration() else sc.hadoopConfiguration
-        log.info("Reading {}", part.pathName)
+        log.debug("Reading {}", part.pathName)
         val shpFile = ShpFile(part.pathName, hadoopConf, 0L)
         val dbfFile = DBFFile(part.pathName, hadoopConf, 0L, columns)
         context.addTaskCompletionListener(_ => {
           shpFile.close()
           dbfFile.close()
         })
-        new ShpIterator(shpFile, dbfFile, schema)
+        shapeFormat match {
+          case ShpOption.FORMAT_WKT => new WKTIterator(shpFile, dbfFile, schema)
+          case ShpOption.FORMAT_WKB => new WKBIterator(shpFile, dbfFile, schema)
+          case ShpOption.FORMAT_GEOJSON => new GeoJSONIterator(shpFile, dbfFile, schema)
+          case _ => new ShpIterator(shpFile, dbfFile, schema)
+        }
       }
       case _ => Iterator.empty
     }

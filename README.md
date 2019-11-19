@@ -9,7 +9,7 @@ This library requires Spark 2.0+
 ### Using with Spark shell
 
 ```shell script
-$SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.3
+$SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.6
 ```
 
 ### Features
@@ -18,7 +18,12 @@ This package allows reading shapefiles in local or distributed filesystem as Spa
 
 - `path` The location of shapefile(s). Similar to Spark can accept standard Hadoop globbing expressions.
 - `shape` An optional name of the shape column. Default value is `shape`.
-- `columns` An optional list of comma separated attribute column names. Default value is blank indicating all attribute fields.  
+- `columns` An optional list of comma separated attribute column names. Default value is blank indicating all attribute fields.
+- `format` An optional parameter to define the output format of the shape field.  Default value is `SHP`. Possible values are:
+    - `SHP` Esri binary shape format.
+    - `WKT` [Well known Text](https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry).
+    - `WKB` [Well Known Binary](https://postgis.net/docs/ST_AsBinary.html)
+    - `GEOJSON` [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON)  
 
 ### SQL API
 

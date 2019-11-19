@@ -18,24 +18,32 @@ package object shp {
      * @return Geometry instance.
      */
     def getGeometry(index: Int = 0): Geometry = {
-      // GeometryEngine.geometryFromEsriShape(row.getAs[Array[Byte]](0), Geometry.Type.Unknown)
       val esriShapeBuffer = row.getAs[Array[Byte]](index)
       op.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, ByteBuffer.wrap(esriShapeBuffer).order(ByteOrder.LITTLE_ENDIAN))
     }
   }
 
   implicit class SQLContextImplicits(sqlContext: SQLContext) extends Serializable {
-    def shp(pathName: String, shapeField: String = ShpOption.SHAPE, columns: String = ""): DataFrame = {
-      sqlContext.baseRelationToDataFrame(ShpRelation(pathName, shapeField, columns)(sqlContext))
+    def shp(pathName: String,
+            shapeName: String = ShpOption.SHAPE,
+            shapeFormat: String = ShpOption.FORMAT_SHP,
+            columns: String = ShpOption.COLUMNS_ALL
+           ): DataFrame = {
+      sqlContext.baseRelationToDataFrame(ShpRelation(pathName, shapeName, shapeFormat, columns)(sqlContext))
     }
   }
 
   implicit class DataFrameReaderImplicits(dataFrameReader: DataFrameReader) extends Serializable {
-    def shp(pathName: String, shapeField: String = ShpOption.SHAPE, columns: String = ""): DataFrame = {
+    def shp(pathName: String,
+            shapeName: String = ShpOption.SHAPE,
+            shapeFormat: String = ShpOption.FORMAT_SHP,
+            columns: String = ShpOption.COLUMNS_ALL
+           ): DataFrame = {
       dataFrameReader
         .format("com.esri.shp")
         .option(ShpOption.PATH, pathName)
-        .option(ShpOption.SHAPE, shapeField)
+        .option(ShpOption.SHAPE, shapeName)
+        .option(ShpOption.FORMAT, shapeFormat)
         .option(ShpOption.COLUMNS, columns)
         .load()
     }
