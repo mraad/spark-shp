@@ -12,7 +12,8 @@ case class ShpPartition(index: Int, pathName: String) extends Partition
 
 case class ShpRDD(@transient sc: SparkContext,
                   schema: StructType,
-                  pathName: String
+                  pathName: String,
+                  columns: Array[String]
                  ) extends RDD[Row](sc, Nil) {
 
   @DeveloperApi
@@ -22,7 +23,7 @@ case class ShpRDD(@transient sc: SparkContext,
         val hadoopConf = if (sc == null) new Configuration() else sc.hadoopConfiguration
         log.info("Reading {}", part.pathName)
         val shpFile = ShpFile(part.pathName, hadoopConf, 0L)
-        val dbfFile = DBFFile(part.pathName, hadoopConf, 0L)
+        val dbfFile = DBFFile(part.pathName, hadoopConf, 0L, columns)
         context.addTaskCompletionListener(_ => {
           shpFile.close()
           dbfFile.close()

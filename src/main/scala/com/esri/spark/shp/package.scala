@@ -25,17 +25,18 @@ package object shp {
   }
 
   implicit class SQLContextImplicits(sqlContext: SQLContext) extends Serializable {
-    def shp(pathName: String, shapeField: String = ShpOption.SHAPE): DataFrame = {
-      sqlContext.baseRelationToDataFrame(ShpRelation(pathName, shapeField)(sqlContext))
+    def shp(pathName: String, shapeField: String = ShpOption.SHAPE, columns: String = ""): DataFrame = {
+      sqlContext.baseRelationToDataFrame(ShpRelation(pathName, shapeField, columns)(sqlContext))
     }
   }
 
   implicit class DataFrameReaderImplicits(dataFrameReader: DataFrameReader) extends Serializable {
-    def shp(pathName: String, shapeField: String = ShpOption.SHAPE): DataFrame = {
+    def shp(pathName: String, shapeField: String = ShpOption.SHAPE, columns: String = ""): DataFrame = {
       dataFrameReader
         .format("com.esri.shp")
         .option(ShpOption.PATH, pathName)
         .option(ShpOption.SHAPE, shapeField)
+        .option(ShpOption.COLUMNS, columns)
         .load()
     }
   }

@@ -50,10 +50,11 @@ object DBFFile extends Serializable {
    * @param pathName the base path to dbf file _without_ the .dbf extension.
    * @param conf     Hadoop configuration reference.
    * @param startRow The starting row.
+   * @param columns  Columns to read.
    * @return DBFFile instance.
    */
-  def apply(pathName: String, conf: Configuration, startRow: Long): DBFFile = {
-    apply(new Path(pathName + ".dbf"), conf, startRow)
+  def apply(pathName: String, conf: Configuration, startRow: Long, columns: Array[String]): DBFFile = {
+    apply(new Path(pathName + ".dbf"), conf, startRow, columns)
   }
 
   /**
@@ -62,9 +63,10 @@ object DBFFile extends Serializable {
    * @param path     Path instance to the dbf file.
    * @param conf     Hadoop configuration reference.
    * @param startRow the starting row.
+   * @param columns  Optional columns to read.
    * @return DBFFile instance.
    */
-  def apply(path: Path, conf: Configuration, startRow: Long): DBFFile = {
+  def apply(path: Path, conf: Configuration, startRow: Long, columns: Array[String]): DBFFile = {
     val stream = path.getFileSystem(conf).open(path)
     val header = DBFHeader(stream)
     val (_, fields) = (1 to header.numFields).foldLeft(
@@ -74,7 +76,11 @@ object DBFFile extends Serializable {
         (offset + field.length, fields :+ field)
       }
     }
+    val newFields = columns match {
+      case Array() => fields
+      case _ => fields.filter(field => columns.contains(field.name))
+    }
     stream.seek(header.rowNumToSeekPos(startRow))
-    new DBFFile(header, fields, stream)
+    new DBFFile(header, newFields, stream)
   }
 }

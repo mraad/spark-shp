@@ -166,7 +166,7 @@ object DBFField extends Serializable {
     val fieldLength = buffer.get(16) & 0x00FF
     val decimalCount = buffer.get(17) & 0x00FF
 
-    logger.info(s"$fieldName $fieldType $fieldLength $decimalCount")
+    logger.debug(s"$fieldName $fieldType $fieldLength $decimalCount")
 
     fieldType match {
       case 'D' => FieldDate(fieldName, offset, fieldLength)
