@@ -7,12 +7,12 @@ import org.apache.hadoop.fs.{FSDataInputStream, Path}
 import org.apache.spark.sql.types.StructField
 
 /**
-  * Create a DBF File.
-  *
-  * @param header DBFHeader instance.
-  * @param fields array of DBFField instances.
-  * @param stream the input stream.
-  */
+ * Create a DBF File.
+ *
+ * @param header DBFHeader instance.
+ * @param fields array of DBFField instances.
+ * @param stream the input stream.
+ */
 class DBFFile(val header: DBFHeader,
               val fields: Array[DBFField],
               stream: FSDataInputStream
@@ -32,39 +32,38 @@ class DBFFile(val header: DBFHeader,
   }
 
   /**
-    * Close the input stream.
-    */
-  override def close() = {
+   * Close the input stream.
+   */
+  override def close(): Unit = {
     stream.close()
   }
 }
 
 /**
-  * Support class object.
-  */
+ * Support class object.
+ */
 object DBFFile extends Serializable {
 
   /**
-    * Create DBFFile instance.
-    *
-    * @param pathName the base path to dbf file _without_ the .dbf extension.
-    * @param conf     Hadoop configuration reference.
-    * @param startRow The starting row.
-    * @return DBFFile instance.
-    */
+   * Create DBFFile instance.
+   *
+   * @param pathName the base path to dbf file _without_ the .dbf extension.
+   * @param conf     Hadoop configuration reference.
+   * @param startRow The starting row.
+   * @return DBFFile instance.
+   */
   def apply(pathName: String, conf: Configuration, startRow: Long): DBFFile = {
-    // TODO Handle case where user passes the full path + ext.
     apply(new Path(pathName + ".dbf"), conf, startRow)
   }
 
   /**
-    * Create DBFFile instance.
-    *
-    * @param path     Path instance to the dbf file.
-    * @param conf     Hadoop configuration reference.
-    * @param startRow the starting row.
-    * @return DBFFile instance.
-    */
+   * Create DBFFile instance.
+   *
+   * @param path     Path instance to the dbf file.
+   * @param conf     Hadoop configuration reference.
+   * @param startRow the starting row.
+   * @return DBFFile instance.
+   */
   def apply(path: Path, conf: Configuration, startRow: Long): DBFFile = {
     val stream = path.getFileSystem(conf).open(path)
     val header = DBFHeader(stream)

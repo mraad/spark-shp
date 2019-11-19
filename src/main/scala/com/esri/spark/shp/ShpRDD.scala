@@ -8,9 +8,7 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.{Partition, SparkContext, TaskContext}
 
-case class ShpPartition(index: Int,
-                        pathName: String
-                       ) extends Partition
+case class ShpPartition(index: Int, pathName: String) extends Partition
 
 case class ShpRDD(@transient sc: SparkContext,
                   schema: StructType,
