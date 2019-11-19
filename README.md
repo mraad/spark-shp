@@ -16,7 +16,8 @@ $SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.3
 
 This package allows reading shapefiles in local or distributed filesystem as Spark DataFrames. When reading files the API accepts several options:
 
-- `path` : location of files. Similar to Spark can accept standard Hadoop globbing expressions.
+- `path` The location of shapefile(s). Similar to Spark can accept standard Hadoop globbing expressions.
+- `shape` An optional name of the shape column. Default value is `shape`. 
 
 ### SQL API
 
