@@ -162,7 +162,7 @@
             </properties>
         </profile>
         <profile>
-            <id>esri-geometry-github</id>
+            <id>esri-geometry-github-spark-2.3</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -170,14 +170,24 @@
                 <geometry.api.artifact>esri-geometry-api</geometry.api.artifact>
                 <geometry.api.version>2.2.3</geometry.api.version>
                 <geometry.api.scope>compile</geometry.api.scope>
+                <java.version>1.8</java.version>
+                <scala.compact>2.11</scala.compact>
+                <scala.version>${scala.compact}.8</scala.version>
+                <spark.version>2.3.4</spark.version>
+                <spark.scope>provided</spark.scope>
             </properties>
         </profile>
         <profile>
-            <id>esri-geometry-olympus</id>
+            <id>esri-geometry-olympus-spark-2.3</id>
             <properties>
                 <geometry.api.artifact>geometry-api-java-full</geometry.api.artifact>
                 <geometry.api.version>10.8.0.12753</geometry.api.version>
                 <geometry.api.scope>provided</geometry.api.scope>
+                <java.version>1.8</java.version>
+                <scala.compact>2.11</scala.compact>
+                <scala.version>${scala.compact}.8</scala.version>
+                <spark.version>2.3.4</spark.version>
+                <spark.scope>provided</spark.scope>
             </properties>
         </profile>
     </profiles>
