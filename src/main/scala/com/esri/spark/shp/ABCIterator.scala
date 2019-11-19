@@ -62,8 +62,8 @@ class ShpIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
 class WKBIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
   extends ABCIterator[Array[Byte]](shpFile, dbfFile, schema) {
 
-  private val opShp = OperatorFactoryLocal.getInstance.getOperator(Operator.Type.ImportFromESRIShape).asInstanceOf[OperatorImportFromESRIShape]
-  private val opExp = OperatorFactoryLocal.getInstance.getOperator(Operator.Type.ExportToWkb).asInstanceOf[OperatorExportToWkb]
+  private val opShp = OperatorImportFromESRIShape.local()
+  private val opExp = OperatorExportToWkb.local()
 
   override def map(bytes: Array[Byte]): Array[Byte] = {
     val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
@@ -77,8 +77,8 @@ class WKBIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
 class WKTIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
   extends ABCIterator[String](shpFile, dbfFile, schema) {
 
-  private val opShp = OperatorFactoryLocal.getInstance.getOperator(Operator.Type.ImportFromESRIShape).asInstanceOf[OperatorImportFromESRIShape]
-  private val opExp = OperatorFactoryLocal.getInstance.getOperator(Operator.Type.ExportToWkt).asInstanceOf[OperatorExportToWkt]
+  private val opShp = OperatorImportFromESRIShape.local()
+  private val opExp = OperatorExportToWkt.local()
 
   override def map(bytes: Array[Byte]): String = {
     val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
@@ -92,8 +92,8 @@ class WKTIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
 class GeoJSONIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
   extends ABCIterator[String](shpFile, dbfFile, schema) {
 
-  private val opShp = OperatorFactoryLocal.getInstance.getOperator(Operator.Type.ImportFromESRIShape).asInstanceOf[OperatorImportFromESRIShape]
-  private val opExp = OperatorFactoryLocal.getInstance.getOperator(Operator.Type.ExportToGeoJson).asInstanceOf[OperatorExportToGeoJson]
+  private val opShp = OperatorImportFromESRIShape.local()
+  private val opExp = OperatorExportToGeoJson.local()
 
   override def map(bytes: Array[Byte]): String = {
     val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))

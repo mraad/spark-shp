@@ -38,8 +38,9 @@ OPTIONS (path "data/gps.shp")
 ```
 df = spark.read \
     .format("com.esri.spark.shp") \
-    .options(path="data/gps.shp") \
-    .load()
+    .options(path="data/gps.shp", columns="atext,adate", format="GEOJSON") \
+    .load() \
+    .cache()
 ```
 
 ### Building From Source
