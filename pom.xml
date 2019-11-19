@@ -21,8 +21,9 @@
         </dependency>
         <dependency>
             <groupId>com.esri.geometry</groupId>
-            <artifactId>esri-geometry-api</artifactId>
-            <version>2.2.3</version>
+            <artifactId>${geometry.api.artifact}</artifactId>
+            <version>${geometry.api.version}</version>
+            <scope>${geometry.api.scope}</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
@@ -158,6 +159,25 @@
                 <scala.version>${scala.compact}.8</scala.version>
                 <spark.version>2.4.2</spark.version>
                 <spark.scope>provided</spark.scope>
+            </properties>
+        </profile>
+        <profile>
+            <id>esri-geometry-github</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <geometry.api.artifact>esri-geometry-api</geometry.api.artifact>
+                <geometry.api.version>2.2.3</geometry.api.version>
+                <geometry.api.scope>compile</geometry.api.scope>
+            </properties>
+        </profile>
+        <profile>
+            <id>esri-geometry-olympus</id>
+            <properties>
+                <geometry.api.artifact>geometry-api-java-full</geometry.api.artifact>
+                <geometry.api.version>10.8.0.12753</geometry.api.version>
+                <geometry.api.scope>provided</geometry.api.scope>
             </properties>
         </profile>
     </profiles>
