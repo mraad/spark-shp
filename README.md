@@ -9,7 +9,7 @@ This library requires Spark 2.0+
 ### Using with Spark shell
 
 ```shell script
-$SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.6
+$SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.8
 ```
 
 ### Features
