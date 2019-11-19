@@ -22,7 +22,7 @@ This package allows reading shapefiles in local or distributed filesystem as Spa
 
 ```sql
 CREATE TABLE gps
-USING com.esri.shp
+USING com.esri.spark.shp
 OPTIONS (path "data/gps.shp")
 ```
 
@@ -31,7 +31,7 @@ OPTIONS (path "data/gps.shp")
 ```
 df = spark.read \
     .format("com.esri.shp") \
-    .options(path=path) \
+    .options(path="data/gps.shp") \
     .load()
 ```
 
