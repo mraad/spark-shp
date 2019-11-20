@@ -33,7 +33,7 @@ case class ShpRelation(pathName: String,
 
   private val arrColumns = columns match {
     case "" => Array.empty[String]
-    case _ => columns.split(',')
+    case _ => columns.split(',').map(_.toLowerCase)
   }
 
   override lazy val schema = {
