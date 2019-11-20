@@ -17,10 +17,12 @@ import org.scalatest.Matchers._
 
 class ShpSuite extends FunSuite with BeforeAndAfterAll {
 
+  private val folder = "src/test/resources"
   private val path = "src/test/resources/test.shp"
   private val numRec = 3
   private var sparkSession: SparkSession = _
 
+  // Logger.getLogger("com.esri.spark.shp").setLevel(Level.DEBUG)
   Logger.getLogger("org.apache").setLevel(Level.WARN)
   Logger.getLogger("com").setLevel(Level.WARN)
   Logger.getLogger("akka").setLevel(Level.WARN)
@@ -49,7 +51,7 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
     val results = sparkSession
       .sqlContext
       .shp(path)
-      .select("aText")
+      .select("*")
       .collect()
 
     assert(results.size === numRec)
@@ -61,10 +63,34 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
       s"""
          |CREATE TEMPORARY VIEW test
          |USING com.esri.spark.shp
-         |OPTIONS (path "$path")
+         |OPTIONS (path "$path", columns "atext,adate")
       """.stripMargin.replaceAll("\n", " "))
 
-    assert(sparkSession.sql("SELECT aText FROM test").collect().size === numRec)
+    assert(sparkSession.sql("SELECT atext,adate FROM test").collect().size === numRec)
+  }
+
+  test("DDL test with path as folder") {
+    sparkSession.sql("DROP VIEW IF EXISTS test")
+    sparkSession.sql(
+      s"""
+         |CREATE TEMPORARY VIEW test
+         |USING com.esri.spark.shp
+         |OPTIONS (path "$folder", columns "adate,along,ashort")
+      """.stripMargin.replaceAll("\n", " "))
+
+    assert(sparkSession.sql("SELECT adate,along,ashort FROM test").collect().size === numRec)
+  }
+
+  test("DDL test with path as glob") {
+    sparkSession.sql("DROP VIEW IF EXISTS test")
+    sparkSession.sql(
+      s"""
+         |CREATE TEMPORARY VIEW test
+         |USING com.esri.spark.shp
+         |OPTIONS (path "$folder/*.shp", columns "adate,along,ashort")
+      """.stripMargin.replaceAll("\n", " "))
+
+    assert(sparkSession.sql("SELECT adate,along,ashort FROM test").collect().size === numRec)
   }
 
 }
