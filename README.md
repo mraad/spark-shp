@@ -54,3 +54,21 @@ mvn clean install
 ### Data
 
 - Download the shapefile of [Metro Stations in DC](https://opendata.dc.gov/datasets/54018b7f06b943f2af278bbe415df1de_52)
+
+### Create Conda Env
+
+```bash
+export ENV=spark-shp
+conda remove --yes --all --name $ENV
+conda create --yes --name $ENV python=3.6
+source activate $ENV
+conda install --yes --quiet -c conda-forge\
+    jupyterlab\
+    tqdm\
+    future\
+    matplotlib=3.1\
+    gdal=2.4\
+    pyproj=2.2\
+    shapely=1.6\
+    pyshp=2.1
+```
