@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat
 
 import scala.io.Source
 import org.apache.hadoop.io.compress.GzipCodec
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.{SQLContext, SaveMode, SparkSession}
 import org.apache.spark.{SparkContext, SparkException}
@@ -20,6 +21,10 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
   private val numRec = 3
   private var sparkSession: SparkSession = _
 
+  Logger.getLogger("org.apache").setLevel(Level.WARN)
+  Logger.getLogger("com").setLevel(Level.WARN)
+  Logger.getLogger("akka").setLevel(Level.WARN)
+
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     sparkSession = SparkSession
@@ -29,7 +34,6 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
       .appName("ShpSuite")
       .config("spark.ui.enabled", false)
       .config("spark.sql.warehouse.dir", "/tmp")
-      // .enableHiveSupport()
       .getOrCreate()
   }
 
@@ -49,6 +53,18 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
       .collect()
 
     assert(results.size === numRec)
+  }
+
+  test("DDL test") {
+    //  sparkSession.sql("DROP TABLE IF EXISTS test")
+    sparkSession.sql(
+      s"""
+         |CREATE TEMPORARY VIEW test
+         |USING com.esri.spark.shp
+         |OPTIONS (path "$path")
+      """.stripMargin.replaceAll("\n", " "))
+
+    assert(sparkSession.sql("SELECT aText FROM test").collect().size === numRec)
   }
 
 }
