@@ -24,7 +24,7 @@ case class ShpRelation(pathName: String,
 
   private lazy val logger = LoggerFactory.getLogger(getClass)
 
-  private[shp] def using[A <: {def close() : Unit}, B](r: A)(f: A => B): B = try {
+  private[shp] def using[A <: {def close(): Unit}, B](r: A)(f: A => B): B = try {
     f(r)
   }
   finally {
@@ -59,7 +59,7 @@ case class ShpRelation(pathName: String,
             case Some(fileStatus) => {
               logger.debug("Schema is based on {}", fileStatus.getPath.toUri.toString)
               using(DBFFile(fileStatus.getPath, configuration, 0L, arrColumns))(dbfFile => {
-                StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType))))
+                StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType, true))))
               })
             }
             case _ => {
@@ -70,7 +70,7 @@ case class ShpRelation(pathName: String,
         }
         else {
           using(DBFFile(pathName.replace(".shp", ""), configuration, 0L, arrColumns))(dbfFile => {
-            StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType))))
+            StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType, true))))
           })
         }
       } else {
@@ -81,7 +81,7 @@ case class ShpRelation(pathName: String,
             val pathName = fileStatus.getPath.toUri.toString.replace(".shp", "")
             logger.debug("Schema is based on {}", pathName)
             using(DBFFile(pathName, configuration, 0L, arrColumns))(dbfFile => {
-              StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType))))
+              StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType, true))))
             })
           }
           case _ => {

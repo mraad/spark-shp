@@ -5,7 +5,7 @@
 
     <groupId>com.esri</groupId>
     <artifactId>spark-shp</artifactId>
-    <version>0.8</version>
+    <version>0.10</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -169,7 +169,7 @@
             <properties>
                 <geometry.api.artifact>esri-geometry-api</geometry.api.artifact>
                 <geometry.api.version>2.2.3</geometry.api.version>
-                <geometry.api.scope>compile</geometry.api.scope>
+                <geometry.api.scope>provided</geometry.api.scope>
             </properties>
         </profile>
         <profile>

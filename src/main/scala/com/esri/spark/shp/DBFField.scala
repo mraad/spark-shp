@@ -53,9 +53,13 @@ case class FieldDate(name: String, offset: Int, length: Int) extends DBFField {
   }
 
   def readValue(buffer: ByteBuffer): Date = {
-    val text = new String(buffer.array(), offset, length).trim()
-    val date = dateFormat.parse(text)
-    new Date(date.getTime)
+    try {
+      val text = new String(buffer.array(), offset, length).trim()
+      val date = dateFormat.parse(text)
+      new Date(date.getTime)
+    } catch {
+      case _: Throwable => null.asInstanceOf[Date]
+    }
   }
 }
 
@@ -79,7 +83,11 @@ case class FieldShort(name: String, offset: Int, length: Int) extends DBFField {
   }
 
   override def readValue(buffer: ByteBuffer): Short = {
-    new String(buffer.array(), offset, length).trim().toShort
+    try {
+      new String(buffer.array(), offset, length).trim().toShort
+    } catch {
+      case _: Throwable => null.asInstanceOf[Short]
+    }
   }
 }
 
@@ -91,7 +99,11 @@ case class FieldInt(name: String, offset: Int, length: Int) extends DBFField {
   }
 
   override def readValue(buffer: ByteBuffer): Int = {
-    new String(buffer.array(), offset, length).trim().toInt
+    try {
+      new String(buffer.array(), offset, length).trim().toInt
+    } catch {
+      case _: Throwable => null.asInstanceOf[Int]
+    }
   }
 }
 
@@ -103,7 +115,11 @@ case class FieldLong(name: String, offset: Int, length: Int) extends DBFField {
   }
 
   override def readValue(buffer: ByteBuffer): Long = {
-    new String(buffer.array(), offset, length).trim().toLong
+    try {
+      new String(buffer.array(), offset, length).trim().toLong
+    } catch {
+      case _: Throwable => null.asInstanceOf[Long]
+    }
   }
 }
 
@@ -115,7 +131,11 @@ case class FieldFloat(name: String, offset: Int, length: Int) extends DBFField {
   }
 
   override def readValue(buffer: ByteBuffer): Float = {
-    new String(buffer.array(), offset, length).trim().toFloat
+    try {
+      new String(buffer.array(), offset, length).trim().toFloat
+    } catch {
+      case _: Throwable => null.asInstanceOf[Float]
+    }
   }
 }
 
@@ -127,7 +147,11 @@ case class FieldDouble(name: String, offset: Int, length: Int) extends DBFField 
   }
 
   override def readValue(buffer: ByteBuffer): Double = {
-    new String(buffer.array(), offset, length).trim().toDouble
+    try {
+      new String(buffer.array(), offset, length).trim().toDouble
+    } catch {
+      case _: Throwable => null.asInstanceOf[Double]
+    }
   }
 }
 
@@ -139,7 +163,11 @@ case class FieldBoolean(name: String, offset: Int, length: Int) extends DBFField
   }
 
   override def readValue(buffer: ByteBuffer): Boolean = {
-    new String(buffer.array(), offset, length).trim().toBoolean
+    try {
+      new String(buffer.array(), offset, length).trim().toBoolean
+    } catch {
+      case _: Throwable => null.asInstanceOf[Boolean]
+    }
   }
 }
 

@@ -3,7 +3,7 @@ package com.esri.spark.shp
 /**
  * Options for spark sql read.
  */
-object ShpOption {
+object ShpOption extends Serializable {
   val PATH = "path"
   val SHAPE = "shape"
 
