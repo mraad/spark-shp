@@ -32,10 +32,11 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
     sparkSession = SparkSession
       .builder()
       .config("spark.serializer", classOf[KryoSerializer].getName)
-      .master("local[*]")
+      .master("local")
       .appName("ShpSuite")
       .config("spark.ui.enabled", false)
       .config("spark.sql.warehouse.dir", "/tmp")
+      .config("spark.sql.catalogImplementation", "in-memory")
       .getOrCreate()
   }
 
@@ -58,13 +59,13 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
   }
 
   test("DDL test") {
-    //  sparkSession.sql("DROP TABLE IF EXISTS test")
+    sparkSession.sql("DROP VIEW IF EXISTS test")
     sparkSession.sql(
       s"""
          |CREATE TEMPORARY VIEW test
          |USING com.esri.spark.shp
          |OPTIONS (path "$path", columns "atext,adate")
-      """.stripMargin.replaceAll("\n", " "))
+        """.stripMargin.replaceAll("\n", " "))
 
     assert(sparkSession.sql("SELECT atext,adate FROM test").collect().size === numRec)
   }
@@ -76,7 +77,7 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
          |CREATE TEMPORARY VIEW test
          |USING com.esri.spark.shp
          |OPTIONS (path "$folder", columns "adate,along,ashort")
-      """.stripMargin.replaceAll("\n", " "))
+        """.stripMargin.replaceAll("\n", " "))
 
     assert(sparkSession.sql("SELECT adate,along,ashort FROM test").collect().size === numRec)
   }
@@ -88,7 +89,7 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
          |CREATE TEMPORARY VIEW test
          |USING com.esri.spark.shp
          |OPTIONS (path "$folder/*.shp", columns "adate,along,ashort")
-      """.stripMargin.replaceAll("\n", " "))
+        """.stripMargin.replaceAll("\n", " "))
 
     assert(sparkSession.sql("SELECT adate,along,ashort FROM test").collect().size === numRec)
   }

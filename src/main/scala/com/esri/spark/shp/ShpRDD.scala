@@ -20,27 +20,30 @@ case class ShpRDD(@transient sc: SparkContext,
   @DeveloperApi
   override def compute(partition: Partition, context: TaskContext): Iterator[Row] = {
     partition match {
-      case part: ShpPartition => {
+      case part: ShpPartition =>
+        if (log.isDebugEnabled) {
+          schema.printTreeString()
+        }
         val hadoopConf = if (sc == null) new Configuration() else sc.hadoopConfiguration
-        log.debug("Reading {}", part.pathName)
+        log.debug("compute::Reading {}", part.pathName)
         val shpFile = ShpFile(part.pathName, hadoopConf, 0L)
         val dbfFile = DBFFile(part.pathName, hadoopConf, 0L, columns)
-        context.addTaskCompletionListener(_ => {
+        context.addTaskCompletionListener[Unit](_ => {
           shpFile.close()
           dbfFile.close()
         })
+        log.debug(s"compute::shapeFormat=$shapeFormat")
         shapeFormat match {
           case ShpOption.FORMAT_WKT => new WKTIterator(shpFile, dbfFile, schema)
           case ShpOption.FORMAT_WKB => new WKBIterator(shpFile, dbfFile, schema)
           case ShpOption.FORMAT_GEOJSON => new GeoJSONIterator(shpFile, dbfFile, schema)
           case _ => new ShpIterator(shpFile, dbfFile, schema)
         }
-      }
       case _ => Iterator.empty
     }
   }
 
-  private[shp] def using[A <: {def close() : Unit}, B](r: A)(f: A => B): B = try {
+  private[shp] def using[A <: {def close(): Unit}, B](r: A)(f: A => B): B = try {
     f(r)
   }
   finally {
@@ -63,9 +66,8 @@ case class ShpRDD(@transient sc: SparkContext,
             })
             .zipWithIndex
             .map {
-              case (fileStatus, index) => {
+              case (fileStatus, index) =>
                 ShpPartition(index, fileStatus.getPath.toUri.toURL.toString.replace(".shp", ""))
-              }
             }
         }
         else {
@@ -77,9 +79,8 @@ case class ShpRDD(@transient sc: SparkContext,
         fs.globStatus(path)
           .zipWithIndex
           .map {
-            case (fileStatus, index) => {
+            case (fileStatus, index) =>
               ShpPartition(index, fileStatus.getPath.toUri.toURL.toString.replace(".shp", ""))
-            }
           }
       }
     })

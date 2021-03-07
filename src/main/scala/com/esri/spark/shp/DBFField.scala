@@ -3,10 +3,9 @@ package com.esri.spark.shp
 import java.nio.{ByteBuffer, ByteOrder}
 import java.sql.Date
 import java.text.SimpleDateFormat
-
 import org.apache.hadoop.fs.FSDataInputStream
 import org.apache.spark.sql.types._
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 
 /**
@@ -41,161 +40,161 @@ trait DBFField extends Serializable {
    * @param buffer the stream byte buffer.
    * @return a field value of type T.
    */
-  def readValue(buffer: ByteBuffer): Option[T]
+  def readValue(buffer: ByteBuffer): T
 }
 
-case class FieldDate(name: String, offset: Int, length: Int) extends DBFField {
+/**
+ * Inject debugger into readValue.
+ */
+trait DBFDebug extends Serializable {
+  protected val logger: Logger = LoggerFactory.getLogger(getClass)
+
+  def readText(buffer: ByteBuffer, offset: Int, length: Int): String = {
+    val text = new String(buffer.array(), offset, length).trim()
+    if (logger.isDebugEnabled) {
+      logger.debug(text)
+    }
+    text
+  }
+}
+
+case class FieldDate(name: String, offset: Int, length: Int) extends DBFField with DBFDebug {
   // Date rather than Timestamp as DBF holds only YYYYMMDD !
   override type T = Date
   private val dateFormat = new SimpleDateFormat("yyyyMMdd")
-  private lazy val logger = LoggerFactory.getLogger(getClass)
 
   def toStructField(): StructField = {
-    StructField(name, DateType)
+    StructField(name, DateType, nullable = true)
   }
 
-  def readValue(buffer: ByteBuffer): Option[Date] = {
+  def readValue(buffer: ByteBuffer): Date = {
     try {
-      val text = new String(buffer.array(), offset, length).trim()
-      val date = dateFormat.parse(text)
-      Some(new Date(date.getTime))
+      val date = dateFormat.parse(readText(buffer, offset, length))
+      new Date(date.getTime)
     } catch {
-      case t: Throwable => {
+      case t: Throwable =>
         logger.error(s"$name ${t.toString}")
-        None
-      }
+        new Date(0L)
     }
   }
 }
 
-case class FieldString(name: String, offset: Int, length: Int) extends DBFField {
+case class FieldString(name: String, offset: Int, length: Int) extends DBFField with DBFDebug {
   override type T = String
 
   def toStructField(): StructField = {
-    StructField(name, StringType)
+    StructField(name, StringType, nullable = true)
   }
 
-  def readValue(buffer: ByteBuffer): Option[String] = {
-    Some(new String(buffer.array(), offset, length).trim())
+  def readValue(buffer: ByteBuffer): String = {
+    readText(buffer, offset, length)
   }
 }
 
-case class FieldShort(name: String, offset: Int, length: Int) extends DBFField {
+case class FieldShort(name: String, offset: Int, length: Int) extends DBFField with DBFDebug {
   override type T = Short
-  private lazy val logger = LoggerFactory.getLogger(getClass)
 
   def toStructField(): StructField = {
-    StructField(name, ShortType)
+    StructField(name, ShortType, nullable = true)
   }
 
-  override def readValue(buffer: ByteBuffer): Option[Short] = {
+  override def readValue(buffer: ByteBuffer): Short = {
     try {
-      Some(new String(buffer.array(), offset, length).trim().toShort)
+      readText(buffer, offset, length).toShort
     } catch {
-      case t: Throwable => {
+      case t: Throwable =>
         logger.error(s"$name ${t.toString}")
-        None
-      }
+        0
     }
   }
 }
 
-case class FieldInt(name: String, offset: Int, length: Int) extends DBFField {
+case class FieldInt(name: String, offset: Int, length: Int) extends DBFField with DBFDebug {
   override type T = Int
-  private lazy val logger = LoggerFactory.getLogger(getClass)
 
   def toStructField(): StructField = {
-    StructField(name, IntegerType)
+    StructField(name, IntegerType, nullable = true)
   }
 
-  override def readValue(buffer: ByteBuffer): Option[Int] = {
+  override def readValue(buffer: ByteBuffer): Int = {
     try {
-      Some(new String(buffer.array(), offset, length).trim().toInt)
+      readText(buffer, offset, length).toInt
     } catch {
-      case t: Throwable => {
+      case t: Throwable =>
         logger.error(s"$name ${t.toString}")
-        None
-      }
+        0
     }
   }
 }
 
-case class FieldLong(name: String, offset: Int, length: Int) extends DBFField {
+case class FieldLong(name: String, offset: Int, length: Int) extends DBFField with DBFDebug {
   override type T = Long
-  private lazy val logger = LoggerFactory.getLogger(getClass)
 
   def toStructField(): StructField = {
-    StructField(name, LongType)
+    StructField(name, LongType, nullable = true)
   }
 
-  override def readValue(buffer: ByteBuffer): Option[Long] = {
+  override def readValue(buffer: ByteBuffer): Long = {
     try {
-      Some(new String(buffer.array(), offset, length).trim().toLong)
+      readText(buffer, offset, length).toLong
     } catch {
-      case t: Throwable => {
+      case t: Throwable =>
         logger.error(s"$name ${t.toString}")
-        None
-      }
+        0L
     }
   }
 }
 
-case class FieldFloat(name: String, offset: Int, length: Int) extends DBFField {
+case class FieldFloat(name: String, offset: Int, length: Int) extends DBFField with DBFDebug {
   override type T = Float
-  private lazy val logger = LoggerFactory.getLogger(getClass)
 
   def toStructField(): StructField = {
-    StructField(name, FloatType)
+    StructField(name, FloatType, nullable = true)
   }
 
-  override def readValue(buffer: ByteBuffer): Option[Float] = {
+  override def readValue(buffer: ByteBuffer): Float = {
     try {
-      Some(new String(buffer.array(), offset, length).trim().toFloat)
+      readText(buffer, offset, length).toFloat
     } catch {
-      case t: Throwable => {
+      case t: Throwable =>
         logger.error(s"$name ${t.toString}")
-        None
-      }
+        0.0F
     }
   }
 }
 
-case class FieldDouble(name: String, offset: Int, length: Int) extends DBFField {
+case class FieldDouble(name: String, offset: Int, length: Int) extends DBFField with DBFDebug {
   override type T = Double
-  private lazy val logger = LoggerFactory.getLogger(getClass)
 
   def toStructField(): StructField = {
-    StructField(name, DoubleType)
+    StructField(name, DoubleType, nullable = true)
   }
 
-  override def readValue(buffer: ByteBuffer): Option[Double] = {
+  override def readValue(buffer: ByteBuffer): Double = {
     try {
-      Some(new String(buffer.array(), offset, length).trim().toDouble)
+      readText(buffer, offset, length).toDouble
     } catch {
-      case t: Throwable => {
+      case t: Throwable =>
         logger.error(s"$name ${t.toString}")
-        None
-      }
+        0.0
     }
   }
 }
 
-case class FieldBoolean(name: String, offset: Int, length: Int) extends DBFField {
+case class FieldBoolean(name: String, offset: Int, length: Int) extends DBFField with DBFDebug {
   override type T = Boolean
-  private lazy val logger = LoggerFactory.getLogger(getClass)
 
   def toStructField(): StructField = {
-    StructField(name, BooleanType)
+    StructField(name, BooleanType, nullable = true)
   }
 
-  override def readValue(buffer: ByteBuffer): Option[Boolean] = {
+  override def readValue(buffer: ByteBuffer): Boolean = {
     try {
-      Some(new String(buffer.array(), offset, length).trim().toBoolean)
+      readText(buffer, offset, length).toBoolean
     } catch {
-      case t: Throwable => {
+      case t: Throwable =>
         logger.error(s"$name ${t.toString}")
-        None
-      }
+        false
     }
   }
 }

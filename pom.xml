@@ -5,7 +5,7 @@
 
     <groupId>com.esri</groupId>
     <artifactId>spark-shp</artifactId>
-    <version>0.11</version>
+    <version>0.20</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -23,6 +23,7 @@
             <groupId>com.esri.geometry</groupId>
             <artifactId>${geometry.api.artifact}</artifactId>
             <version>${geometry.api.version}</version>
+            <classifier>${geometry.api.classifier}</classifier>
             <scope>${geometry.api.scope}</scope>
             <exclusions>
                 <exclusion>
@@ -38,25 +39,26 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-aws</artifactId>
-            <version>2.8.4</version>
+            <version>2.8.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.10.6</version>
+            <version>1.11.969</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.10.1</version>
+            <version>2.12.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.10.1</version>
+            <version>2.12.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
@@ -86,7 +88,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>4.3.0</version>
+                <version>4.4.1</version>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -132,7 +134,7 @@
             <plugin>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest-maven-plugin</artifactId>
-                <version>2.0.0</version>
+                <version>2.0.2</version>
                 <configuration>
                     <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                     <junitxml>.</junitxml>
@@ -163,9 +165,6 @@
         </profile>
         <profile>
             <id>spark-2.3</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <java.version>1.8</java.version>
                 <scala.compact>2.11</scala.compact>
@@ -180,7 +179,20 @@
                 <java.version>1.8</java.version>
                 <scala.compact>2.12</scala.compact>
                 <scala.version>${scala.compact}.8</scala.version>
-                <spark.version>2.4.2</spark.version>
+                <spark.version>2.4.7</spark.version>
+                <spark.scope>provided</spark.scope>
+            </properties>
+        </profile>
+        <profile>
+            <id>spark-3.1.1</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <java.version>1.8</java.version>
+                <scala.compact>2.12</scala.compact>
+                <scala.version>${scala.compact}.10</scala.version>
+                <spark.version>3.1.1</spark.version>
                 <spark.scope>provided</spark.scope>
             </properties>
         </profile>
@@ -191,7 +203,8 @@
             </activation>
             <properties>
                 <geometry.api.artifact>esri-geometry-api</geometry.api.artifact>
-                <geometry.api.version>2.2.3</geometry.api.version>
+                <geometry.api.version>2.2.4</geometry.api.version>
+                <geometry.api.classifier></geometry.api.classifier>
                 <geometry.api.scope>provided</geometry.api.scope>
             </properties>
         </profile>
@@ -199,7 +212,8 @@
             <id>esri-geometry-olympus</id>
             <properties>
                 <geometry.api.artifact>geometry-api-java-full</geometry.api.artifact>
-                <geometry.api.version>10.8.0.12753</geometry.api.version>
+                <geometry.api.version>10.9.0.0-SNAPSHOT</geometry.api.version>
+                <geometry.api.classifier>obfuscated</geometry.api.classifier>
                 <geometry.api.scope>provided</geometry.api.scope>
             </properties>
         </profile>

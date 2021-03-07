@@ -1,11 +1,13 @@
 package com.esri.spark.shp
 
+import org.slf4j.LoggerFactory
+
 import java.io.{DataInputStream, IOException}
 import java.nio.{ByteBuffer, ByteOrder}
 
 /**
-  * Shapefile header instance.
-  */
+ * Shapefile header instance.
+ */
 class ShpHeader(val shapeType: Int,
                 val xmin: Double,
                 val ymin: Double,
@@ -18,16 +20,18 @@ class ShpHeader(val shapeType: Int,
                ) extends Serializable
 
 /**
-  * Supporting class object.
-  */
+ * Supporting class object.
+ */
 object ShpHeader extends Serializable {
 
+  private val logger = LoggerFactory.getLogger(getClass)
+
   /**
-    * Create ShpHeader instance.
-    *
-    * @param stream the input stream.
-    * @return A ShpHeader instance.
-    */
+   * Create ShpHeader instance.
+   *
+   * @param stream the input stream.
+   * @return A ShpHeader instance.
+   */
   def apply(stream: DataInputStream) = {
     val buffer = ByteBuffer.allocate(100).order(ByteOrder.BIG_ENDIAN)
     stream.readFully(buffer.array)
@@ -47,6 +51,11 @@ object ShpHeader extends Serializable {
     val zmax = buffer.getDouble(76)
     val mmin = buffer.getDouble(84)
     val mmax = buffer.getDouble(92)
+    if (logger.isDebugEnabled) {
+      logger.debug(s"shapeType=$shapeType")
+      logger.debug(s"xmin=$xmin ymin=$ymin")
+      logger.debug(s"xmax=$xmax ymax=$ymax")
+    }
     new ShpHeader(shapeType, xmin, ymin, xmax, ymax, zmin, zmax, mmin, mmax)
   }
 
