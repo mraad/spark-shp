@@ -54,7 +54,11 @@ object DBFFile extends Serializable {
    * @return DBFFile instance.
    */
   def apply(pathName: String, conf: Configuration, startRow: Long, columns: Array[String]): DBFFile = {
-    apply(new Path(pathName + ".dbf"), conf, startRow, columns)
+    val _pathName = if (pathName.endsWith(".shp"))
+      pathName.replace(".shp", ".dbf")
+    else
+      pathName + ".dbf"
+    apply(new Path(_pathName), conf, startRow, columns)
   }
 
   /**

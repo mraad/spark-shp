@@ -18,7 +18,7 @@ class ShpFile(shpHeader: ShpHeader,
   var rowNum = 0
 
   private val header = ByteBuffer.allocate(8).order(ByteOrder.BIG_ENDIAN)
-  private val logger = LoggerFactory.getLogger(getClass)
+  // private val logger = LoggerFactory.getLogger(getClass)
 
   /**
    * @return geometry as an array of bytes.
@@ -29,9 +29,9 @@ class ShpFile(shpHeader: ShpHeader,
     rowNum = header.getInt
     val contentLen = header.getInt * 2
     val contentArr = Array.ofDim[Byte](contentLen)
-    if (logger.isDebugEnabled) {
-      logger.debug(s"next::rowNum=$rowNum contentLen=$contentLen")
-    }
+    //    if (logger.isDebugEnabled) {
+    //      logger.debug(s"next::rowNum=$rowNum contentLen=$contentLen")
+    //    }
     stream.readFully(contentArr, 0, contentLen)
     contentArr
   }

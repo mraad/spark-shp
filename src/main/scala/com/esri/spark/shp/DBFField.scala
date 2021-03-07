@@ -47,13 +47,14 @@ trait DBFField extends Serializable {
  * Inject debugger into readValue.
  */
 trait DBFDebug extends Serializable {
-  protected val logger: Logger = LoggerFactory.getLogger(getClass)
+  protected lazy val logger: Logger = LoggerFactory.getLogger(getClass)
 
+  @inline
   def readText(buffer: ByteBuffer, offset: Int, length: Int): String = {
     val text = new String(buffer.array(), offset, length).trim()
-    if (logger.isDebugEnabled) {
-      logger.debug(text)
-    }
+    //    if (logger.isDebugEnabled) {
+    //      logger.debug(text)
+    //    }
     text
   }
 }
