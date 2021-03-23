@@ -1,19 +1,9 @@
 package com.esri.spark.shp
 
-import java.io.File
-import java.nio.charset.UnsupportedCharsetException
-import java.sql.{Date, Timestamp}
-import java.text.SimpleDateFormat
-
-import scala.io.Source
-import org.apache.hadoop.io.compress.GzipCodec
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.serializer.KryoSerializer
-import org.apache.spark.sql.{SQLContext, SaveMode, SparkSession}
-import org.apache.spark.{SparkContext, SparkException}
-import org.apache.spark.sql.types._
+import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
-import org.scalatest.Matchers._
 
 class ShpSuite extends FunSuite with BeforeAndAfterAll {
 
