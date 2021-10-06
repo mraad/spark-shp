@@ -5,41 +5,41 @@ import java.nio.{ByteBuffer, ByteOrder}
 import org.apache.hadoop.fs.FSDataInputStream
 
 /**
-  * A DBF Header.
-  *
-  * @param numRows      the number of rows.
-  * @param headerLength the length of the header.
-  * @param rowLength    the length of the row.
-  */
+ * A DBF Header.
+ *
+ * @param numRows      the number of rows.
+ * @param headerLength the length of the header.
+ * @param rowLength    the length of the row.
+ */
 case class DBFHeader(numRows: Int, headerLength: Short, rowLength: Short) {
 
   /**
-    * The number of fields.
-    */
-  val numFields = (headerLength - 1) / 32 - 1
+   * The number of fields.
+   */
+  val numFields: Int = (headerLength - 1) / 32 - 1
 
   /**
-    * Converts given row number to a seek position in the stream.
-    *
-    * @param rowNum the record number.
-    * @return the seek position in the stream
-    */
+   * Converts given row number to a seek position in the stream.
+   *
+   * @param rowNum the record number.
+   * @return the seek position in the stream
+   */
   def rowNumToSeekPos(rowNum: Long): Long = {
     headerLength + rowLength * rowNum
   }
 }
 
 /**
-  * Supporting class object.
-  */
+ * Supporting class object.
+ */
 object DBFHeader extends Serializable {
 
   /**
-    * Create DBFHeader instance.
-    *
-    * @param stream the input stream.
-    * @return A DBFHeader instance.
-    */
+   * Create DBFHeader instance.
+   *
+   * @param stream the input stream.
+   * @return A DBFHeader instance.
+   */
   def apply(stream: FSDataInputStream): DBFHeader = {
     val buffer = ByteBuffer.allocate(32).order(ByteOrder.LITTLE_ENDIAN)
     stream.readFully(buffer.array)

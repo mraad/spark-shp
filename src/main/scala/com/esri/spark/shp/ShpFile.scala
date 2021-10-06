@@ -3,7 +3,7 @@ package com.esri.spark.shp
 import java.nio.{ByteBuffer, ByteOrder}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, Path}
-import org.slf4j.LoggerFactory
+// import org.slf4j.LoggerFactory
 
 /**
  * ShpFile instance.
@@ -39,7 +39,7 @@ class ShpFile(shpHeader: ShpHeader,
   /**
    * Close the stream.
    */
-  override def close() = {
+  override def close(): Unit = {
     stream.close()
   }
 

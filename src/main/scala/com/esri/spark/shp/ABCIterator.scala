@@ -17,7 +17,7 @@ import java.nio.{ByteBuffer, ByteOrder}
 abstract class ABCIterator[T](shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
   extends Iterator[Row] with Serializable {
 
-  val count = dbfFile.header.numRows
+  val count: Int = dbfFile.header.numRows
   var index = 0
 
   /**
@@ -40,8 +40,8 @@ abstract class ABCIterator[T](shpFile: ShpFile, dbfFile: DBFFile, schema: Struct
    */
   override def next(): Row = {
     index += 1
-    val shp = map(shpFile.next)
-    val dbf = dbfFile.next
+    val shp = map(shpFile.next())
+    val dbf = dbfFile.next()
     new GenericRowWithSchema(shp +: dbf, schema)
   }
 

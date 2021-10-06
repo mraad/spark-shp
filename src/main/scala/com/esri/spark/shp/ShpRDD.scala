@@ -28,6 +28,7 @@ case class ShpRDD(@transient sc: SparkContext,
         log.debug("compute::Reading {}", part.pathName)
         val shpFile = ShpFile(part.pathName, hadoopConf, 0L)
         val dbfFile = DBFFile(part.pathName, hadoopConf, 0L, columns)
+        // Uncomment for Spark 2.4+
         context.addTaskCompletionListener[Unit](_ => {
           shpFile.close()
           dbfFile.close()

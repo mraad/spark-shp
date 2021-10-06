@@ -19,7 +19,7 @@ class ShxFile(val shpHeader: ShpHeader,
     * @param featureNum the feature number.
     * @return a stream seek position.
     */
-  def rowNumToSeekPos(featureNum: Long) = {
+  def rowNumToSeekPos(featureNum: Long): Long = {
     stream.seek(100L + featureNum * 8L)
     stream.readInt() * 2L
   }
@@ -27,7 +27,7 @@ class ShxFile(val shpHeader: ShpHeader,
   /**
     * Close the input stream.
     */
-  override def close() = {
+  override def close(): Unit = {
     stream.close()
   }
 
@@ -43,9 +43,9 @@ object ShxFile extends Serializable {
     *
     * @param pathName the path to the shapefile.
     * @param conf     Hadoop configuration reference.
-    * @return the numner of features in the shapefile.
+    * @return the number of features in the shapefile.
     */
-  def getNumRows(pathName: String, conf: Configuration) = {
+  def getNumRows(pathName: String, conf: Configuration): Long = {
     // TODO, handle case when user passes .shp ext.
     val path = new Path(pathName + ".shx")
     val status = path.getFileSystem(conf).getFileStatus(path)
@@ -59,7 +59,7 @@ object ShxFile extends Serializable {
     * @param conf     Hadoop configuration reference.
     * @return ShxFile instance.
     */
-  def apply(pathName: String, conf: Configuration) = {
+  def apply(pathName: String, conf: Configuration): ShxFile = {
     val path = new Path(pathName + ".shx")
     val stream = path.getFileSystem(conf).open(path)
     val shpHeader = ShpHeader(stream)

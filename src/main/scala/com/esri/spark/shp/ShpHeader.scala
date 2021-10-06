@@ -32,7 +32,7 @@ object ShpHeader extends Serializable {
    * @param stream the input stream.
    * @return A ShpHeader instance.
    */
-  def apply(stream: DataInputStream) = {
+  def apply(stream: DataInputStream): ShpHeader = {
     val buffer = ByteBuffer.allocate(100).order(ByteOrder.BIG_ENDIAN)
     stream.readFully(buffer.array)
 

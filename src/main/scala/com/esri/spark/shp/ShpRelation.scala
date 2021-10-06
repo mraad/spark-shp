@@ -5,7 +5,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.sources.{BaseRelation, TableScan}
 import org.apache.spark.sql.types.{BinaryType, StringType, StructField, StructType}
 import org.apache.spark.sql.{Row, SQLContext}
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
  * Shapefile Relation
@@ -22,7 +22,7 @@ case class ShpRelation(pathName: String,
                       )(@transient val sqlContext: SQLContext)
   extends BaseRelation with TableScan {
 
-  private lazy val logger = LoggerFactory.getLogger(getClass)
+  private lazy val logger: Logger = LoggerFactory.getLogger(getClass)
 
   private[shp] def using[A <: {def close(): Unit}, B](r: A)(f: A => B): B = try {
     f(r)
@@ -36,7 +36,7 @@ case class ShpRelation(pathName: String,
     case _ => columns.split(',').map(_.toLowerCase)
   }
 
-  override lazy val schema = {
+  override lazy val schema: StructType = {
     val shapeType = shapeFormat match {
       case ShpOption.FORMAT_WKT => StringType
       case ShpOption.FORMAT_GEOJSON => StringType
@@ -56,38 +56,34 @@ case class ShpRelation(pathName: String,
               }
             })
             .headOption match {
-            case Some(fileStatus) => {
+            case Some(fileStatus) =>
               logger.debug("Schema is based on {}", fileStatus.getPath.toUri.toString)
               using(DBFFile(fileStatus.getPath, configuration, 0L, arrColumns))(dbfFile => {
-                StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType, true))))
+                StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType, nullable = true))))
               })
-            }
-            case _ => {
+            case _ =>
               logger.warn(s"Cannot find a dbf file in $pathName. Creating an empty schema !")
               StructType(Array.empty[StructField])
-            }
           }
         }
         else {
           using(DBFFile(pathName.replace(".shp", ""), configuration, 0L, arrColumns))(dbfFile => {
-            StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType, true))))
+            StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType, nullable = true))))
           })
         }
       } else {
         // User provided regexp path, ie. /data/foo*.shp
         fs.globStatus(path)
           .headOption match {
-          case Some(fileStatus) => {
+          case Some(fileStatus) =>
             val pathName = fileStatus.getPath.toUri.toString.replace(".shp", "")
             logger.debug("Schema is based on {}", pathName)
             using(DBFFile(pathName, configuration, 0L, arrColumns))(dbfFile => {
-              StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType, true))))
+              StructType(dbfFile.addFieldTypes(Array(StructField(shapeName, shapeType, nullable = true))))
             })
-          }
-          case _ => {
+          case _ =>
             logger.warn(s"Cannot match file with $pathName. Creating an empty schema !")
             StructType(Array.empty[StructField])
-          }
         }
       }
     })

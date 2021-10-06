@@ -75,10 +75,9 @@ object DBFFile extends Serializable {
     val header = DBFHeader(stream)
     val (_, fields) = (1 to header.numFields).foldLeft(
       (1, Array.empty[DBFField])) {
-      case ((offset, fields), _) => {
+      case ((offset, fields), _) =>
         val field = DBFField(stream, offset)
         (offset + field.length, fields :+ field)
-      }
     }
     val newFields = columns match {
       case Array() => fields
