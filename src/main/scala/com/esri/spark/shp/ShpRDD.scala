@@ -34,7 +34,7 @@ case class ShpRDD(@transient sc: SparkContext,
           dbfFile.close()
         })
         log.debug(s"compute::shapeFormat=$shapeFormat")
-        shapeFormat match {
+        shapeFormat.toUpperCase match {
           case ShpOption.FORMAT_WKT => new WKTIterator(shpFile, dbfFile, schema)
           case ShpOption.FORMAT_WKB => new WKBIterator(shpFile, dbfFile, schema)
           case ShpOption.FORMAT_GEOJSON => new GeoJSONIterator(shpFile, dbfFile, schema)
