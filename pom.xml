@@ -5,11 +5,13 @@
 
     <groupId>com.esri</groupId>
     <artifactId>spark-shp</artifactId>
-    <version>0.21</version>
+    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sparkshp.version>0.21</sparkshp.version>
+        <revision>${sparkshp.version}-${spark.version}-${scala.compact}</revision>
     </properties>
 
     <dependencies>
@@ -76,12 +78,14 @@
                 <version>3.2.0</version>
                 <executions>
                     <execution>
+                        <!--
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <configuration>
                             <classifier>${scala.compact}</classifier>
                         </configuration>
+                        -->
                     </execution>
                 </executions>
             </plugin>
@@ -205,7 +209,7 @@
                 <java.version>1.8</java.version>
                 <scala.compact>2.12</scala.compact>
                 <scala.version>${scala.compact}.10</scala.version>
-                <spark.version>3.1.1</spark.version>
+                <spark.version>3.1.2</spark.version>
                 <spark.scope>provided</spark.scope>
             </properties>
         </profile>
