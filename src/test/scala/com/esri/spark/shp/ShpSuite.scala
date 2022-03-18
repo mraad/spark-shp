@@ -3,9 +3,10 @@ package com.esri.spark.shp
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
 
-class ShpSuite extends FunSuite with BeforeAndAfterAll {
+class ShpSuite extends AnyFlatSpec with BeforeAndAfterAll {
 
   private val folder = "src/test/resources"
   private val path = "src/test/resources/test.shp"
@@ -38,7 +39,7 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  test("DSL test") {
+  it should "DSL test" in {
     val results = sparkSession
       .sqlContext
       .shp(path)
@@ -48,7 +49,7 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
     assert(results.size === numRec)
   }
 
-  test("DDL test") {
+  it should "DDL test" in {
     sparkSession.sql("DROP VIEW IF EXISTS test")
     sparkSession.sql(
       s"""
@@ -60,7 +61,7 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
     assert(sparkSession.sql("SELECT atext,adate FROM test").collect().size === numRec)
   }
 
-  test("DDL test with path as folder") {
+  it should "DDL test with path as folder" in {
     sparkSession.sql("DROP VIEW IF EXISTS test")
     sparkSession.sql(
       s"""
@@ -72,7 +73,7 @@ class ShpSuite extends FunSuite with BeforeAndAfterAll {
     assert(sparkSession.sql("SELECT adate,along,ashort FROM test").collect().size === numRec)
   }
 
-  test("DDL test with path as glob") {
+  it should "DDL test with path as glob" in {
     sparkSession.sql("DROP VIEW IF EXISTS test")
     sparkSession.sql(
       s"""

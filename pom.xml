@@ -10,8 +10,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sparkshp.version>0.21</sparkshp.version>
-        <revision>${sparkshp.version}-${spark.version}-${scala.compact}</revision>
+        <this.version>0.21</this.version>
+        <revision>${this.version}-${spark.version}-${scala.compact}</revision>
     </properties>
 
     <dependencies>
@@ -220,8 +220,8 @@
             <properties>
                 <java.version>1.8</java.version>
                 <scala.compact>2.12</scala.compact>
-                <scala.version>${scala.compact}.10</scala.version>
-                <scalatest.version>3.1.0</scalatest.version>
+                <scala.version>${scala.compact}.15</scala.version>
+                <scalatest.version>3.2.10</scalatest.version>
                 <spark.version>3.2.1</spark.version>
                 <spark.scope>provided</spark.scope>
             </properties>
