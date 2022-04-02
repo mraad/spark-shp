@@ -1,14 +1,20 @@
 package com.esri.spark.shp
 
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.sources.{BaseRelation, RelationProvider, SchemaRelationProvider}
+import org.apache.spark.sql.sources.{BaseRelation, DataSourceRegister, RelationProvider, SchemaRelationProvider}
 import org.apache.spark.sql.types.StructType
 import org.slf4j.LoggerFactory
 
 /**
  * Provides access to Shapefile data from pure SQL statements.
  */
-class DefaultSource extends RelationProvider with SchemaRelationProvider {
+class DefaultSource extends RelationProvider with SchemaRelationProvider with DataSourceRegister {
+
+  /**
+   * @return the short name of the datasource.
+   */
+  override def shortName(): String = "shp"
+
   /**
    * Creates a new relation for data store in Shapefile given parameters.
    * Parameters must include 'path' and 'name'.
