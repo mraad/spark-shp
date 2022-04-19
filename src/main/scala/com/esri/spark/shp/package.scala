@@ -28,13 +28,15 @@ package object shp {
             shapeName: String = ShpOption.SHAPE,
             shapeFormat: String = ShpOption.FORMAT_SHP,
             columns: String = ShpOption.COLUMNS_ALL,
-            repair: String = ShpOption.REPAIR_NONE
+            repair: String = ShpOption.REPAIR_NONE,
+            wkid: String = ShpOption.WKID_NONE
            ): DataFrame = {
       sqlContext.baseRelationToDataFrame(ShpRelation(pathName,
         shapeName,
         shapeFormat,
         columns,
-        repair)(sqlContext))
+        repair,
+        wkid)(sqlContext))
     }
   }
 
@@ -43,7 +45,8 @@ package object shp {
             shapeName: String = ShpOption.SHAPE,
             shapeFormat: String = ShpOption.FORMAT_SHP,
             columns: String = ShpOption.COLUMNS_ALL,
-            repair: String = ShpOption.REPAIR_NONE
+            repair: String = ShpOption.REPAIR_NONE,
+            wkid: String = ShpOption.WKID_NONE
            ): DataFrame = {
       dataFrameReader
         .format("shp")
@@ -52,6 +55,7 @@ package object shp {
         .option(ShpOption.FORMAT, shapeFormat)
         .option(ShpOption.COLUMNS, columns)
         .option(ShpOption.REPAIR, repair)
+        .option(ShpOption.WKID, wkid)
         .load()
     }
   }

@@ -13,7 +13,7 @@ class RepairNone() extends Repair {
   override def repair(geom: Geometry): Geometry = geom
 }
 
-class RepairEsri(sr: SpatialReference = null) extends Repair {
+class RepairEsri(sr: SpatialReference) extends Repair {
   private val operator = OperatorSimplify.local
 
   override def repair(geom: Geometry): Geometry = {
@@ -21,7 +21,7 @@ class RepairEsri(sr: SpatialReference = null) extends Repair {
   }
 }
 
-class RepairOGC(sr: SpatialReference = null) extends Repair {
+class RepairOGC(sr: SpatialReference) extends Repair {
   private val operator = OperatorSimplifyOGC.local
 
   override def repair(geom: Geometry): Geometry = {
@@ -36,7 +36,8 @@ case class ShpRDD(@transient sc: SparkContext,
                   pathName: String,
                   columns: Array[String],
                   shapeFormat: String,
-                  repairMode: String
+                  repairMode: String,
+                  wkid: String
                  ) extends RDD[Row](sc, Nil) {
 
   @DeveloperApi
@@ -55,11 +56,18 @@ case class ShpRDD(@transient sc: SparkContext,
           shpFile.close()
           dbfFile.close()
         })
+        val numeric = """(\d+)""".r
+        val sr = wkid match {
+          case ShpOption.WKID_NONE => null
+          case numeric(value) => SpatialReference.create(value.toInt)
+          case value: String => SpatialReference.create(value)
+          case _ => null
+        }
         val repairImpl = repairMode.toLowerCase match {
           case ShpOption.REPAIR_ESRI =>
-            new RepairEsri()
+            new RepairEsri(sr)
           case ShpOption.REPAIR_OGC =>
-            new RepairOGC()
+            new RepairOGC(sr)
           case _ =>
             new RepairNone()
         }

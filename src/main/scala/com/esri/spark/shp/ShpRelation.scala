@@ -8,18 +8,21 @@ import org.apache.spark.sql.{Row, SQLContext}
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
- * Shapefile Relation
+ * Shapefile Relation.
  *
  * @param pathName    The path name where shapefiles are located.
  * @param shapeName   The name of the shape field.
  * @param shapeFormat The shape field output format.
  * @param columns     Comma separated list of columns to read. "" means all fields.
+ * @param repair      Repair mode, none, esri, ogc.
+ * @param wkid        The spatial reference identifier.
  */
 case class ShpRelation(pathName: String,
                        shapeName: String,
                        shapeFormat: String,
                        columns: String,
-                       repair: String
+                       repair: String,
+                       wkid: String
                       )(@transient val sqlContext: SQLContext)
   extends BaseRelation with TableScan {
 
@@ -91,6 +94,6 @@ case class ShpRelation(pathName: String,
   }
 
   override def buildScan(): RDD[Row] = {
-    ShpRDD(sqlContext.sparkContext, schema, pathName, arrColumns, shapeFormat, repair)
+    ShpRDD(sqlContext.sparkContext, schema, pathName, arrColumns, shapeFormat, repair, wkid)
   }
 }

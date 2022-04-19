@@ -20,4 +20,7 @@ object ShpOption extends Serializable {
   val REPAIR_NONE = "none"
   val REPAIR_ESRI = "esri"
   val REPAIR_OGC = "ogc"
+
+  val WKID = "wkid"
+  val WKID_NONE = "-1"
 }
