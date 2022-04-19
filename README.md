@@ -19,18 +19,25 @@ This package allows reading shapefiles in local or distributed filesystem as Spa
 - `path` The location of shapefile(s). Similar to Spark can accept standard Hadoop globbing expressions.
 - `shape` An optional name of the shape column. Default value is `shape`.
 - `columns` An optional list of comma separated attribute column names. Default value is blank indicating all attribute fields.
-- `format` An optional parameter to define the output format of the shape field.  Default value is `SHP`. Possible values are:
+- `format` An optional parameter to define the output format of the shape field. Default value is `SHP`. Possible values are:
     - `SHP` Esri binary shape format.
     - `WKT` [Well known Text](https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry).
     - `WKB` [Well Known Binary](https://postgis.net/docs/ST_AsBinary.html)
-    - `GEOJSON` [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON)  
+    - `GEOJSON` [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON)
+- `repair` An optional parameter to repair the read geometry. Possible values are:
+    - `None` No repair.
+    - `Esri` Apply Esri repair operator.
+    - `OGC` Apply OGC repair operator.
 
 ### SQL API
 
 ```sql
 CREATE TABLE gps
-USING com.esri.spark.shp
-OPTIONS (path "data/gps.shp")
+    USING com.esri.spark.shp
+    OPTIONS
+(
+    path "data/gps.shp"
+)
 ```
 
 ### Python API
