@@ -18,7 +18,8 @@ import org.slf4j.{Logger, LoggerFactory}
 case class ShpRelation(pathName: String,
                        shapeName: String,
                        shapeFormat: String,
-                       columns: String
+                       columns: String,
+                       repair: String
                       )(@transient val sqlContext: SQLContext)
   extends BaseRelation with TableScan {
 
@@ -90,6 +91,6 @@ case class ShpRelation(pathName: String,
   }
 
   override def buildScan(): RDD[Row] = {
-    ShpRDD(sqlContext.sparkContext, schema, pathName, arrColumns, shapeFormat)
+    ShpRDD(sqlContext.sparkContext, schema, pathName, arrColumns, shapeFormat, repair)
   }
 }

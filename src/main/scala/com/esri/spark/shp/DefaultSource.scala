@@ -1,5 +1,6 @@
 package com.esri.spark.shp
 
+import javafx.scene.shape.Shape
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.sources.{BaseRelation, DataSourceRegister, RelationProvider, SchemaRelationProvider}
 import org.apache.spark.sql.types.StructType
@@ -38,7 +39,13 @@ class DefaultSource extends RelationProvider with SchemaRelationProvider with Da
     val shape = parameters.getOrElse(ShpOption.SHAPE, ShpOption.SHAPE)
     val format = parameters.getOrElse(ShpOption.FORMAT, ShpOption.FORMAT_SHP)
     val columns = parameters.getOrElse(ShpOption.COLUMNS, "")
-    logger.debug(s"${ShpOption.PATH}=$path, ${ShpOption.SHAPE}=$shape, ${ShpOption.COLUMNS}=$columns")
-    ShpRelation(path, shape, format, columns)(sqlContext)
+    val repair = parameters.getOrElse(ShpOption.REPAIR, ShpOption.REPAIR_NONE)
+    if (logger.isDebugEnabled) {
+      logger.debug(s"${ShpOption.PATH}=$path")
+      logger.debug(s"${ShpOption.SHAPE}=$shape")
+      logger.debug(s"${ShpOption.COLUMNS}=$columns")
+      logger.debug(s"${ShpOption.REPAIR}=$repair")
+    }
+    ShpRelation(path, shape, format, columns, repair)(sqlContext)
   }
 }

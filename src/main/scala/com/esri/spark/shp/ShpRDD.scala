@@ -1,5 +1,6 @@
 package com.esri.spark.shp
 
+import com.esri.core.geometry.{Geometry, OperatorSimplify, OperatorSimplifyOGC, SpatialReference}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{Path, PathFilter}
 import org.apache.spark.annotation.DeveloperApi
@@ -8,13 +9,34 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.{Partition, SparkContext, TaskContext}
 
+class RepairNone() extends Repair {
+  override def repair(geom: Geometry): Geometry = geom
+}
+
+class RepairEsri(sr: SpatialReference = null) extends Repair {
+  private val operator = OperatorSimplify.local
+
+  override def repair(geom: Geometry): Geometry = {
+    operator.execute(geom, sr, true, null)
+  }
+}
+
+class RepairOGC(sr: SpatialReference = null) extends Repair {
+  private val operator = OperatorSimplifyOGC.local
+
+  override def repair(geom: Geometry): Geometry = {
+    operator.execute(geom, sr, true, null)
+  }
+}
+
 case class ShpPartition(index: Int, pathName: String) extends Partition // TODO, Remove index as it is not used !
 
 case class ShpRDD(@transient sc: SparkContext,
                   schema: StructType,
                   pathName: String,
                   columns: Array[String],
-                  shapeFormat: String
+                  shapeFormat: String,
+                  repairMode: String
                  ) extends RDD[Row](sc, Nil) {
 
   @DeveloperApi
@@ -33,11 +55,19 @@ case class ShpRDD(@transient sc: SparkContext,
           shpFile.close()
           dbfFile.close()
         })
-        log.debug(s"compute::shapeFormat=$shapeFormat")
+        val repairImpl = repairMode.toLowerCase match {
+          case ShpOption.REPAIR_ESRI =>
+            new RepairEsri()
+          case ShpOption.REPAIR_OGC =>
+            new RepairOGC()
+          case _ =>
+            new RepairNone()
+        }
+        // log.debug(s"compute::shapeFormat=$shapeFormat")
         shapeFormat.toUpperCase match {
-          case ShpOption.FORMAT_WKT => new WKTIterator(shpFile, dbfFile, schema)
-          case ShpOption.FORMAT_WKB => new WKBIterator(shpFile, dbfFile, schema)
-          case ShpOption.FORMAT_GEOJSON => new GeoJSONIterator(shpFile, dbfFile, schema)
+          case ShpOption.FORMAT_WKT => new WKTIterator(shpFile, dbfFile, schema, repairImpl)
+          case ShpOption.FORMAT_WKB => new WKBIterator(shpFile, dbfFile, schema, repairImpl)
+          case ShpOption.FORMAT_GEOJSON => new GeoJSONIterator(shpFile, dbfFile, schema, repairImpl)
           case _ => new ShpIterator(shpFile, dbfFile, schema)
         }
       case _ => Iterator.empty

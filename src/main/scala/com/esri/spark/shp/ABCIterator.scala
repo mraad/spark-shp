@@ -59,7 +59,10 @@ class ShpIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
 /**
  * Iterator to return the geometry in WKB format.
  */
-class WKBIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
+class WKBIterator(shpFile: ShpFile,
+                  dbfFile: DBFFile,
+                  schema: StructType,
+                  repair: Repair)
   extends ABCIterator[Array[Byte]](shpFile, dbfFile, schema) {
 
   private val opShp = OperatorImportFromESRIShape.local
@@ -69,36 +72,50 @@ class WKBIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
     val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted,
       Geometry.Type.Unknown,
       ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
-    opExp.execute(ShapeExportFlags.ShapeExportDefaults, geometry, null).array()
+    opExp.execute(ShapeExportFlags.ShapeExportDefaults,
+      repair.repair(geometry),
+      null).array()
   }
 }
 
 /**
  * Iterator to return the geometry in WKT format.
  */
-class WKTIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
+class WKTIterator(shpFile: ShpFile,
+                  dbfFile: DBFFile,
+                  schema: StructType,
+                  repair: Repair)
   extends ABCIterator[String](shpFile, dbfFile, schema) {
 
   private val opShp = OperatorImportFromESRIShape.local
   private val opExp = OperatorExportToWkt.local
 
   override def map(bytes: Array[Byte]): String = {
-    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
-    opExp.execute(ShapeExportFlags.ShapeExportDefaults, geometry, null)
+    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted,
+      Geometry.Type.Unknown,
+      ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
+    opExp.execute(ShapeExportFlags.ShapeExportDefaults,
+      repair.repair(geometry),
+      null)
   }
 }
 
 /**
  * Iterator to return the geometry in GeoJSON format.
  */
-class GeoJSONIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
+class GeoJSONIterator(shpFile: ShpFile,
+                      dbfFile: DBFFile,
+                      schema: StructType,
+                      repair: Repair)
   extends ABCIterator[String](shpFile, dbfFile, schema) {
 
   private val opShp = OperatorImportFromESRIShape.local
   private val opExp = OperatorExportToGeoJson.local
 
   override def map(bytes: Array[Byte]): String = {
-    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
-    opExp.execute(geometry)
+    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted,
+      Geometry.Type.Unknown,
+      ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
+    opExp.execute(repair.repair(geometry))
   }
 }

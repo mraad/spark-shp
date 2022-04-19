@@ -27,9 +27,14 @@ package object shp {
     def shp(pathName: String,
             shapeName: String = ShpOption.SHAPE,
             shapeFormat: String = ShpOption.FORMAT_SHP,
-            columns: String = ShpOption.COLUMNS_ALL
+            columns: String = ShpOption.COLUMNS_ALL,
+            repair: String = ShpOption.REPAIR_NONE
            ): DataFrame = {
-      sqlContext.baseRelationToDataFrame(ShpRelation(pathName, shapeName, shapeFormat, columns)(sqlContext))
+      sqlContext.baseRelationToDataFrame(ShpRelation(pathName,
+        shapeName,
+        shapeFormat,
+        columns,
+        repair)(sqlContext))
     }
   }
 
@@ -37,14 +42,16 @@ package object shp {
     def shp(pathName: String,
             shapeName: String = ShpOption.SHAPE,
             shapeFormat: String = ShpOption.FORMAT_SHP,
-            columns: String = ShpOption.COLUMNS_ALL
+            columns: String = ShpOption.COLUMNS_ALL,
+            repair: String = ShpOption.REPAIR_NONE
            ): DataFrame = {
       dataFrameReader
-        .format("com.esri.shp")
+        .format("shp")
         .option(ShpOption.PATH, pathName)
         .option(ShpOption.SHAPE, shapeName)
         .option(ShpOption.FORMAT, shapeFormat)
         .option(ShpOption.COLUMNS, columns)
+        .option(ShpOption.REPAIR, repair)
         .load()
     }
   }

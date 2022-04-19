@@ -15,4 +15,9 @@ object ShpOption extends Serializable {
   val FORMAT_WKT = "WKT"
   val FORMAT_WKB = "WKB"
   val FORMAT_GEOJSON = "GEOJSON"
+
+  val REPAIR = "repair"
+  val REPAIR_NONE = "none"
+  val REPAIR_ESRI = "esri"
+  val REPAIR_OGC = "ogc"
 }
