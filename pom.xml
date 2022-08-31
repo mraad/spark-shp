@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <this.version>0.24</this.version>
+        <this.version>0.25</this.version>
         <revision>${this.version}-${spark.version}-${scala.compact}</revision>
     </properties>
 
@@ -229,7 +229,7 @@
         <profile>
             <id>spark-3.2.2</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
                 <java.version>1.8</java.version>
@@ -270,7 +270,7 @@
             <id>esri-geometry-olympus</id>
             <properties>
                 <geometry.api.artifact>geometry-api-java-full</geometry.api.artifact>
-                <geometry.api.version>10.9.0.0-SNAPSHOT</geometry.api.version>
+                <geometry.api.version>11.1.0.40446</geometry.api.version>
                 <geometry.api.classifier>obfuscated</geometry.api.classifier>
                 <geometry.api.scope>provided</geometry.api.scope>
             </properties>

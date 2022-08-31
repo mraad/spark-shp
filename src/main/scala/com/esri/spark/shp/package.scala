@@ -26,7 +26,7 @@ package object shp {
   implicit class SQLContextImplicits(sqlContext: SQLContext) extends Serializable {
     def shp(pathName: String,
             shapeName: String = ShpOption.SHAPE,
-            shapeFormat: String = ShpOption.FORMAT_SHP,
+            shapeFormat: String = ShpOption.FORMAT_WKB,
             columns: String = ShpOption.COLUMNS_ALL,
             repair: String = ShpOption.REPAIR_NONE,
             wkid: String = ShpOption.WKID_NONE
@@ -43,7 +43,7 @@ package object shp {
   implicit class DataFrameReaderImplicits(dataFrameReader: DataFrameReader) extends Serializable {
     def shp(pathName: String,
             shapeName: String = ShpOption.SHAPE,
-            shapeFormat: String = ShpOption.FORMAT_SHP,
+            shapeFormat: String = ShpOption.FORMAT_WKB,
             columns: String = ShpOption.COLUMNS_ALL,
             repair: String = ShpOption.REPAIR_NONE,
             wkid: String = ShpOption.WKID_NONE
