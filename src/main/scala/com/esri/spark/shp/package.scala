@@ -7,8 +7,8 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, Row, SQLContext}
 
 package object shp {
 
-  implicit class RowImplicits(row: Row) extends Serializable {
-    private val op = OperatorFactoryLocal.getInstance.getOperator(Operator.Type.ImportFromESRIShape).asInstanceOf[OperatorImportFromESRIShape]
+  implicit class RowImplicits(val row: Row) extends AnyVal {
+    // private val op = OperatorFactoryLocal.getInstance.getOperator(Operator.Type.ImportFromESRIShape).asInstanceOf[OperatorImportFromESRIShape]
 
     /**
      * Get Geometry instance from SQL Row.
@@ -19,11 +19,15 @@ package object shp {
      */
     def getGeometry(index: Int = 0): Geometry = {
       val esriShapeBuffer = row.getAs[Array[Byte]](index)
-      op.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, ByteBuffer.wrap(esriShapeBuffer).order(ByteOrder.LITTLE_ENDIAN))
+      OperatorImportFromESRIShape
+        .local()
+        .execute(ShapeImportFlags.ShapeImportNonTrusted,
+          Geometry.Type.Unknown,
+          ByteBuffer.wrap(esriShapeBuffer).order(ByteOrder.LITTLE_ENDIAN))
     }
   }
 
-  implicit class SQLContextImplicits(sqlContext: SQLContext) extends Serializable {
+  implicit class SQLContextImplicits(val sqlContext: SQLContext) extends AnyVal {
     def shp(pathName: String,
             shapeName: String = ShpOption.SHAPE,
             shapeFormat: String = ShpOption.FORMAT_WKB,
@@ -40,7 +44,7 @@ package object shp {
     }
   }
 
-  implicit class DataFrameReaderImplicits(dataFrameReader: DataFrameReader) extends Serializable {
+  implicit class DataFrameReaderImplicits(val dataFrameReader: DataFrameReader) extends AnyVal {
     def shp(pathName: String,
             shapeName: String = ShpOption.SHAPE,
             shapeFormat: String = ShpOption.FORMAT_WKB,
