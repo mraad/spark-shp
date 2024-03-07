@@ -5,6 +5,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.sources.{BaseRelation, TableScan}
 import org.apache.spark.sql.types.{BinaryType, StringType, StructField, StructType}
 import org.apache.spark.sql.{Row, SQLContext}
+import org.apache.spark.util.SerializableConfiguration
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
@@ -23,12 +24,14 @@ case class ShpRelation(pathName: String,
                        columns: String,
                        repair: String,
                        wkid: String
-                      )(@transient val sqlContext: SQLContext)
+                      )
+                      (@transient val sqlContext: SQLContext)
   extends BaseRelation with TableScan {
 
   private lazy val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  private[shp] def using[A <: {def close(): Unit}, B](r: A)(f: A => B): B = try {
+  private[shp] def using[A <: {def close(): Unit}, B](r: A)
+                                                     (f: A => B): B = try {
     f(r)
   }
   finally {
@@ -94,6 +97,9 @@ case class ShpRelation(pathName: String,
   }
 
   override def buildScan(): RDD[Row] = {
-    ShpRDD(sqlContext.sparkContext, schema, pathName, arrColumns, shapeFormat, repair, wkid)
+    ShpRDD(
+      sqlContext.sparkContext,
+      new SerializableConfiguration(sqlContext.sparkContext.hadoopConfiguration),
+      schema, pathName, arrColumns, shapeFormat, repair, wkid)
   }
 }

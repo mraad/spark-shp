@@ -7,6 +7,7 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.StructType
+import org.apache.spark.util.SerializableConfiguration
 import org.apache.spark.{Partition, SparkContext, TaskContext}
 
 class RepairNone() extends Repair {
@@ -29,9 +30,12 @@ class RepairOGC(sr: SpatialReference) extends Repair {
   }
 }
 
-case class ShpPartition(index: Int, pathName: String) extends Partition // TODO, Remove index as it is not used !
+case class ShpPartition(index: Int,
+                        pathName: String
+                       ) extends Partition // TODO, Remove index as it is not used !
 
 case class ShpRDD(@transient sc: SparkContext,
+                  hadoopConfSer: SerializableConfiguration,
                   schema: StructType,
                   pathName: String,
                   columns: Array[String],
@@ -41,16 +45,18 @@ case class ShpRDD(@transient sc: SparkContext,
                  ) extends RDD[Row](sc, Nil) {
 
   @DeveloperApi
-  override def compute(partition: Partition, context: TaskContext): Iterator[Row] = {
+  override def compute(partition: Partition,
+                       context: TaskContext
+                      ): Iterator[Row] = {
     partition match {
       case part: ShpPartition =>
         if (log.isDebugEnabled) {
           schema.printTreeString()
         }
-        val hadoopConf = if (sc == null) new Configuration() else sc.hadoopConfiguration
+        // val hadoopConf = if (sc == null) new Configuration() else sc.hadoopConfiguration
         log.debug("compute::Reading {}", part.pathName)
-        val shpFile = ShpFile(part.pathName, hadoopConf, 0L)
-        val dbfFile = DBFFile(part.pathName, hadoopConf, 0L, columns)
+        val shpFile = ShpFile(part.pathName, hadoopConfSer.value, 0L)
+        val dbfFile = DBFFile(part.pathName, hadoopConfSer.value, 0L, columns)
         // Uncomment for Spark 2.4+
         context.addTaskCompletionListener[Unit](_ => {
           shpFile.close()
@@ -82,7 +88,8 @@ case class ShpRDD(@transient sc: SparkContext,
     }
   }
 
-  private[shp] def using[A <: {def close(): Unit}, B](r: A)(f: A => B): B = try {
+  private[shp] def using[A <: {def close(): Unit}, B](r: A)
+                                                     (f: A => B): B = try {
     f(r)
   }
   finally {
