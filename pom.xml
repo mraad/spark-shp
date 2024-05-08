@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <this.version>0.28</this.version>
+        <this.version>0.29</this.version>
         <revision>${this.version}-${spark.compact}-${scala.compact}</revision>
     </properties>
 
@@ -75,7 +75,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
                         <!--
@@ -92,7 +92,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>4.8.0</version>
+                <version>4.9.0</version>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -121,7 +121,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -256,7 +256,22 @@
                 <scala.version>${scala.compact}.17</scala.version>
                 <scalatest.version>3.2.10</scalatest.version>
                 <spark.compact>3.4</spark.compact>
-                <spark.version>${spark.compact}.0</spark.version>
+                <spark.version>${spark.compact}.2</spark.version>
+                <spark.scope>provided</spark.scope>
+            </properties>
+        </profile>
+        <profile>
+            <id>spark-3.5</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <java.version>1.8</java.version>
+                <scala.compact>2.12</scala.compact>
+                <scala.version>${scala.compact}.18</scala.version>
+                <scalatest.version>3.2.10</scalatest.version>
+                <spark.compact>3.5</spark.compact>
+                <spark.version>${spark.compact}.1</spark.version>
                 <spark.scope>provided</spark.scope>
             </properties>
         </profile>
@@ -274,6 +289,9 @@
         </profile>
         <profile>
             <id>esri-geometry-olympus</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
             <properties>
                 <geometry.api.artifact>geometry-api-java-full</geometry.api.artifact>
                 <geometry.api.version>11.1.0.40611</geometry.api.version>
