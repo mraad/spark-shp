@@ -74,7 +74,7 @@ case class FieldDate(name: String, offset: Int, length: Int) extends DBFField wi
       new Date(date.getTime)
     } catch {
       case t: Throwable =>
-        logger.error(s"$name ${t.toString}")
+        logger.warn(s"$name ${t.toString}")
         new Date(0L)
     }
   }
@@ -104,7 +104,7 @@ case class FieldShort(name: String, offset: Int, length: Int) extends DBFField w
       readText(buffer, offset, length).toShort
     } catch {
       case t: Throwable =>
-        logger.error(s"$name ${t.toString}")
+        logger.warn(s"$name ${t.toString}")
         0
     }
   }
@@ -122,7 +122,7 @@ case class FieldInt(name: String, offset: Int, length: Int) extends DBFField wit
       readText(buffer, offset, length).toInt
     } catch {
       case t: Throwable =>
-        logger.error(s"$name ${t.toString}")
+        logger.warn(s"$name ${t.toString}")
         0
     }
   }
@@ -140,7 +140,7 @@ case class FieldLong(name: String, offset: Int, length: Int) extends DBFField wi
       readText(buffer, offset, length).toLong
     } catch {
       case t: Throwable =>
-        logger.error(s"$name ${t.toString}")
+        logger.warn(s"$name ${t.toString}")
         0L
     }
   }
@@ -158,7 +158,7 @@ case class FieldFloat(name: String, offset: Int, length: Int) extends DBFField w
       readText(buffer, offset, length).toFloat
     } catch {
       case t: Throwable =>
-        logger.error(s"$name ${t.toString}")
+        logger.warn(s"$name ${t.toString}")
         0.0F
     }
   }
@@ -176,7 +176,7 @@ case class FieldDouble(name: String, offset: Int, length: Int) extends DBFField 
       readText(buffer, offset, length).toDouble
     } catch {
       case t: Throwable =>
-        logger.error(s"$name ${t.toString}")
+        logger.warn(s"$name ${t.toString}")
         0.0
     }
   }
@@ -194,7 +194,7 @@ case class FieldBoolean(name: String, offset: Int, length: Int) extends DBFField
       readText(buffer, offset, length).toBoolean
     } catch {
       case t: Throwable =>
-        logger.error(s"$name ${t.toString}")
+        logger.warn(s"$name ${t.toString}")
         false
     }
   }
