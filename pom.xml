@@ -75,7 +75,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
                 <executions>
                     <execution>
                         <!--
@@ -92,7 +92,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>4.9.0</version>
+                <version>4.9.2</version>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -218,7 +218,7 @@
         <profile>
             <id>spark-3.2</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
                 <java.version>1.8</java.version>
@@ -263,7 +263,7 @@
         <profile>
             <id>spark-3.5</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <java.version>1.8</java.version>
@@ -271,7 +271,7 @@
                 <scala.version>${scala.compact}.18</scala.version>
                 <scalatest.version>3.2.10</scalatest.version>
                 <spark.compact>3.5</spark.compact>
-                <spark.version>${spark.compact}.1</spark.version>
+                <spark.version>${spark.compact}.3</spark.version>
                 <spark.scope>provided</spark.scope>
             </properties>
         </profile>
@@ -282,7 +282,7 @@
             </activation>
             <properties>
                 <geometry.api.artifact>esri-geometry-api</geometry.api.artifact>
-                <geometry.api.version>2.2.4</geometry.api.version>
+                <geometry.api.version>2.2.5-SNAPSHOT</geometry.api.version>
                 <geometry.api.classifier/>
                 <geometry.api.scope>provided</geometry.api.scope>
             </properties>

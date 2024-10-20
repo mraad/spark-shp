@@ -4,12 +4,12 @@ A library for parsing and querying [shapefile](https://en.wikipedia.org/wiki/Sha
 
 ### Requirements
 
-This library requires Spark 2.0+
+This library requires Spark 2.0+ and make sure to clone and install https://github.com/Esri/geometry-api-java.git
 
 ### Using with Spark shell
 
 ```shell script
-$SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.8
+$SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.30
 ```
 
 ### Features
@@ -44,7 +44,7 @@ CREATE TABLE gps
 
 ```
 df = spark.read \
-    .format("com.esri.spark.shp") \
+    .format("shp") \
     .options(path="data/gps.shp", columns="atext,adate", format="GEOJSON") \
     .load() \
     .cache()
