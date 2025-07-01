@@ -53,13 +53,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.12.2</version>
+            <version>2.19.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.12.2</version>
+            <version>2.19.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -92,7 +92,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>4.9.2</version>
+                <version>4.9.5</version>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -121,7 +121,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>3.14.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -271,7 +271,7 @@
                 <scala.version>${scala.compact}.18</scala.version>
                 <scalatest.version>3.2.10</scalatest.version>
                 <spark.compact>3.5</spark.compact>
-                <spark.version>${spark.compact}.3</spark.version>
+                <spark.version>${spark.compact}.4</spark.version>
                 <spark.scope>provided</spark.scope>
             </properties>
         </profile>
