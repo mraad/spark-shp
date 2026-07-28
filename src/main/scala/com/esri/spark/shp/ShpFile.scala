@@ -1,39 +1,41 @@
 package com.esri.spark.shp
 
-import java.nio.{ByteBuffer, ByteOrder}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, Path}
-// import org.slf4j.LoggerFactory
+
+import java.nio.{ByteBuffer, ByteOrder}
 
 /**
  * ShpFile instance.
  *
- * @param shpHeader the shapefile header.
- * @param stream    the input stream.
+ * @param stream the input stream, positioned at the first record.
  */
-class ShpFile(shpHeader: ShpHeader,
-              stream: FSDataInputStream
-             ) extends Serializable with AutoCloseable {
+class ShpFile(stream: FSDataInputStream) extends AutoCloseable {
 
   var rowNum = 0
 
   private val header = ByteBuffer.allocate(8).order(ByteOrder.BIG_ENDIAN)
-  // private val logger = LoggerFactory.getLogger(getClass)
+  private var content = ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN)
 
   /**
-   * @return geometry as an array of bytes.
+   * Read the next geometry.
+   *
+   * Note, the returned buffer is reused between calls. Copy the content if it has to outlive the call.
+   *
+   * @return the geometry in Esri shape format, positioned at 0 and limited to the record content length.
    */
-  def next(): Array[Byte] = {
+  def next(): ByteBuffer = {
     header.rewind
     stream.readFully(header.array)
     rowNum = header.getInt
     val contentLen = header.getInt * 2
-    val contentArr = Array.ofDim[Byte](contentLen)
-    //    if (logger.isDebugEnabled) {
-    //      logger.debug(s"next::rowNum=$rowNum contentLen=$contentLen")
-    //    }
-    stream.readFully(contentArr, 0, contentLen)
-    contentArr
+    if (contentLen > content.capacity) {
+      content = ByteBuffer.allocate(contentLen).order(ByteOrder.LITTLE_ENDIAN)
+    }
+    stream.readFully(content.array, 0, contentLen)
+    content.position(0)
+    content.limit(contentLen)
+    content
   }
 
   /**
@@ -52,17 +54,15 @@ object ShpFile extends Serializable {
   /**
    * Create ShpFile instance.
    *
-   * @param pathName      the shape file path without .shp extension.
+   * @param pathName      the shape file path with or without the .shp extension.
    * @param configuration Hadoop configuration instance.
-   * @param seekPosition  the seek position in the input stream.
    * @return a ShpFile instance.
    */
-  def apply(pathName: String, configuration: Configuration, seekPosition: Long): ShpFile = {
-    val _pathName = if (pathName.endsWith(".shp")) pathName else pathName + ".shp"
-    val path = new Path(_pathName)
+  def apply(pathName: String, configuration: Configuration): ShpFile = {
+    val path = new Path(pathName.stripSuffix(".shp") + ".shp")
     val stream = path.getFileSystem(configuration).open(path)
-    val shpHeader = ShpHeader(stream)
-    stream.seek(100L.max(seekPosition))
-    new ShpFile(shpHeader, stream)
+    // Validates the file signature and leaves the stream positioned at the first record.
+    ShpHeader(stream)
+    new ShpFile(stream)
   }
 }

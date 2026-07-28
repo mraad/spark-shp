@@ -43,6 +43,7 @@ class DefaultSource extends RelationProvider with SchemaRelationProvider with Da
     if (logger.isDebugEnabled) {
       logger.debug(s"${ShpOption.PATH} = $path")
       logger.debug(s"${ShpOption.SHAPE} = $shape")
+      logger.debug(s"${ShpOption.FORMAT} = $format")
       logger.debug(s"${ShpOption.COLUMNS} = $columns")
       logger.debug(s"${ShpOption.REPAIR} = $repair")
       logger.debug(s"${ShpOption.WKID} = $wkid")
