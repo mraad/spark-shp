@@ -1,8 +1,8 @@
 package com.esri.spark.shp
 
-import java.nio.{ByteBuffer, ByteOrder}
-
 import org.apache.hadoop.fs.FSDataInputStream
+
+import java.nio.{ByteBuffer, ByteOrder}
 
 /**
  * A DBF Header.
@@ -11,22 +11,12 @@ import org.apache.hadoop.fs.FSDataInputStream
  * @param headerLength the length of the header.
  * @param rowLength    the length of the row.
  */
-case class DBFHeader(numRows: Int, headerLength: Short, rowLength: Short) {
+case class DBFHeader(numRows: Int, headerLength: Int, rowLength: Int) {
 
   /**
    * The number of fields.
    */
   val numFields: Int = (headerLength - 1) / 32 - 1
-
-  /**
-   * Converts given row number to a seek position in the stream.
-   *
-   * @param rowNum the record number.
-   * @return the seek position in the stream
-   */
-  def rowNumToSeekPos(rowNum: Long): Long = {
-    headerLength + rowLength * rowNum
-  }
 }
 
 /**
@@ -43,10 +33,8 @@ object DBFHeader extends Serializable {
   def apply(stream: FSDataInputStream): DBFHeader = {
     val buffer = ByteBuffer.allocate(32).order(ByteOrder.LITTLE_ENDIAN)
     stream.readFully(buffer.array)
-    val numRecords = buffer.getInt(4)
-    val headerLen = buffer.getShort(8)
-    val recordLen = buffer.getShort(10)
-    new DBFHeader(numRecords, headerLen, recordLen)
+    // The header and record lengths are _unsigned_ shorts, a wide dbf overflows a signed short.
+    new DBFHeader(buffer.getInt(4), buffer.getShort(8) & 0xFFFF, buffer.getShort(10) & 0xFFFF)
   }
 
 }

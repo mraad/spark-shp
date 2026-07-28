@@ -5,7 +5,8 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types.StructType
 
-import java.nio.{ByteBuffer, ByteOrder}
+import java.nio.ByteBuffer
+import java.util.Arrays
 
 /**
  * Create an abstract Spark SQL Row iterator.
@@ -20,13 +21,17 @@ abstract class ABCIterator[T](shpFile: ShpFile, dbfFile: DBFFile, schema: Struct
   val count: Int = dbfFile.header.numRows
   var index = 0
 
+  private val numCols = dbfFile.fields.length + 1
+
   /**
-   * Map bytes to explicit geometry type.
+   * Map the Esri shape bytes to an explicit geometry type.
    *
-   * @param bytes array of bytes.
+   * Note, the buffer is reused between calls, do not retain a reference to it.
+   *
+   * @param buffer the Esri shape bytes.
    * @return A T instance.
    */
-  def map(bytes: Array[Byte]): T
+  def map(buffer: ByteBuffer): T
 
   /**
    * @return true if iterator has more rows, false otherwise.
@@ -40,9 +45,10 @@ abstract class ABCIterator[T](shpFile: ShpFile, dbfFile: DBFFile, schema: Struct
    */
   override def next(): Row = {
     index += 1
-    val shp = map(shpFile.next())
-    val dbf = dbfFile.next()
-    new GenericRowWithSchema(shp +: dbf, schema)
+    val values = new Array[Any](numCols)
+    values(0) = map(shpFile.next())
+    dbfFile.next(values, 1)
+    new GenericRowWithSchema(values, schema)
   }
 
 }
@@ -53,7 +59,8 @@ abstract class ABCIterator[T](shpFile: ShpFile, dbfFile: DBFFile, schema: Struct
 class ShpIterator(shpFile: ShpFile, dbfFile: DBFFile, schema: StructType)
   extends ABCIterator[Array[Byte]](shpFile, dbfFile, schema) {
 
-  override def map(bytes: Array[Byte]): Array[Byte] = bytes
+  // The bytes outlive the call as they end up in the Row, so they have to be copied out of the shared buffer.
+  override def map(buffer: ByteBuffer): Array[Byte] = Arrays.copyOf(buffer.array, buffer.limit)
 }
 
 /**
@@ -68,13 +75,9 @@ class WKBIterator(shpFile: ShpFile,
   private val opShp = OperatorImportFromESRIShape.local
   private val opExp = OperatorExportToWkb.local
 
-  override def map(bytes: Array[Byte]): Array[Byte] = {
-    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted,
-      Geometry.Type.Unknown,
-      ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
-    opExp.execute(ShapeExportFlags.ShapeExportDefaults,
-      repair.repair(geometry),
-      null).array()
+  override def map(buffer: ByteBuffer): Array[Byte] = {
+    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, buffer)
+    opExp.execute(ShapeExportFlags.ShapeExportDefaults, repair.repair(geometry), null).array()
   }
 }
 
@@ -90,13 +93,9 @@ class WKTIterator(shpFile: ShpFile,
   private val opShp = OperatorImportFromESRIShape.local
   private val opExp = OperatorExportToWkt.local
 
-  override def map(bytes: Array[Byte]): String = {
-    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted,
-      Geometry.Type.Unknown,
-      ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
-    opExp.execute(ShapeExportFlags.ShapeExportDefaults,
-      repair.repair(geometry),
-      null)
+  override def map(buffer: ByteBuffer): String = {
+    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, buffer)
+    opExp.execute(ShapeExportFlags.ShapeExportDefaults, repair.repair(geometry), null)
   }
 }
 
@@ -112,10 +111,8 @@ class GeoJSONIterator(shpFile: ShpFile,
   private val opShp = OperatorImportFromESRIShape.local
   private val opExp = OperatorExportToGeoJson.local
 
-  override def map(bytes: Array[Byte]): String = {
-    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted,
-      Geometry.Type.Unknown,
-      ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN))
+  override def map(buffer: ByteBuffer): String = {
+    val geometry = opShp.execute(ShapeImportFlags.ShapeImportNonTrusted, Geometry.Type.Unknown, buffer)
     opExp.execute(repair.repair(geometry))
   }
 }

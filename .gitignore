@@ -6,3 +6,4 @@ derby.log
 *.ipynb
 *.iml
 *.sh
+.DS_Store
