@@ -66,9 +66,9 @@ mvn clean install                                       # Spark 3.5 / Scala 2.12
 mvn -P spark-4.3,esri-geometry-github clean install     # Spark 4.3 / Scala 2.13
 ```
 
-Name `esri-geometry-github` with any `-P`: Maven drops every `activeByDefault` profile once `-P` selects one, and that profile supplies the geometry API coordinates.
+With `-P`, name a Spark profile **and** `esri-geometry-github` (for example `-P spark-3.5,esri-geometry-github`): Maven drops every `activeByDefault` profile once `-P` selects one, so `-P esri-geometry-github` alone leaves the Spark properties unset, and `-P spark-4.3` alone leaves the geometry API coordinates unset.
 
-To read `s3a://` paths, add the `hadoop-aws` jar that matches your Spark's Hadoop version.
+To read `s3a://` paths, add the S3A connector with `--packages org.apache.hadoop:hadoop-aws:<your Spark's Hadoop version>`. `--packages` also resolves the AWS SDK bundle that connector needs (SDK v1 for Hadoop 3.3, v2 from Hadoop 3.4). With `--jars`, add that SDK bundle yourself.
 
 ### Data
 
