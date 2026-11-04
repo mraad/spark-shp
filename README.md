@@ -4,12 +4,19 @@ A library for parsing and querying [shapefile](https://en.wikipedia.org/wiki/Sha
 
 ### Requirements
 
-This library requires Spark 2.0+ and make sure to clone and install https://github.com/Esri/geometry-api-java.git
+Two build lines:
+
+| Profile | Spark | Scala | Java | Jar |
+|---|---|---|---|---|
+| `spark-3.5` (default) | 3.5.9 | 2.12 | 8+ | `spark-shp-0.33-3.5-2.12.jar` |
+| `spark-4.3` | 4.3.0 | 2.13 | 17+ | `spark-shp-0.33-4.3-2.13.jar` |
+
+The Esri Geometry API (`com.esri.geometry:esri-geometry-api:2.3.1`, Maven Central) is a `provided` dependency: put it on the classpath next to the jar.
 
 ### Using with Spark shell
 
 ```shell script
-$SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.30
+$SPARK_HOME/bin/spark-shell --jars spark-shp-0.33-3.5-2.12.jar --packages com.esri.geometry:esri-geometry-api:2.3.1
 ```
 
 ### Features
@@ -55,8 +62,13 @@ df = spark.read \
 This library is built using [Apache Maven](https://maven.apache.org/). To build the jar, execute the following command:
 
 ```shell script
-mvn clean install
+mvn clean install                                       # Spark 3.5 / Scala 2.12
+mvn -P spark-4.3,esri-geometry-github clean install     # Spark 4.3 / Scala 2.13
 ```
+
+Name `esri-geometry-github` with any `-P`: Maven drops every `activeByDefault` profile once `-P` selects one, and that profile supplies the geometry API coordinates.
+
+To read `s3a://` paths, add the `hadoop-aws` jar that matches your Spark's Hadoop version.
 
 ### Data
 
