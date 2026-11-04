@@ -4,12 +4,19 @@ A library for parsing and querying [shapefile](https://en.wikipedia.org/wiki/Sha
 
 ### Requirements
 
-This library requires Spark 2.0+ and make sure to clone and install https://github.com/Esri/geometry-api-java.git
+Two build lines:
+
+| Profile | Spark | Scala | Java | Jar |
+|---|---|---|---|---|
+| `spark-3.5` (default) | 3.5.9 | 2.12 | 8+ | `spark-shp-0.33-3.5-2.12.jar` |
+| `spark-4.3` | 4.3.0 | 2.13 | 17+ | `spark-shp-0.33-4.3-2.13.jar` |
+
+The Esri Geometry API (`com.esri.geometry:esri-geometry-api:2.3.1`, Maven Central) is a `provided` dependency: put it on the classpath next to the jar.
 
 ### Using with Spark shell
 
 ```shell script
-$SPARK_HOME/bin/spark-shell --packages com.esri:spark-shp:0.30
+$SPARK_HOME/bin/spark-shell --jars spark-shp-0.33-3.5-2.12.jar --packages com.esri.geometry:esri-geometry-api:2.3.1
 ```
 
 ### Features
@@ -55,8 +62,13 @@ df = spark.read \
 This library is built using [Apache Maven](https://maven.apache.org/). To build the jar, execute the following command:
 
 ```shell script
-mvn clean install
+mvn clean install                                       # Spark 3.5 / Scala 2.12
+mvn -P spark-4.3,esri-geometry-github clean install     # Spark 4.3 / Scala 2.13
 ```
+
+With `-P`, name a Spark profile **and** `esri-geometry-github` (for example `-P spark-3.5,esri-geometry-github`): Maven drops every `activeByDefault` profile once `-P` selects one, so `-P esri-geometry-github` alone leaves the Spark properties unset, and `-P spark-4.3` alone leaves the geometry API coordinates unset.
+
+To read `s3a://` paths, add the S3A connector with `--packages org.apache.hadoop:hadoop-aws:<your Spark's Hadoop version>`. `--packages` also resolves the AWS SDK bundle that connector needs (SDK v1 for Hadoop 3.3, v2 from Hadoop 3.4). With `--jars`, add that SDK bundle yourself.
 
 ### Data
 
